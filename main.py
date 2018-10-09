@@ -33,13 +33,13 @@ configuration = cfg.get_parameters()
 # site table
 site_table = configuration['site_table']
 outSiteFullName = '/data/out/tables/' + 'site' + '.csv'
-outDestinationSite = 'ex_cxense_site'
+outDestinationSite = 'site'
 
 # traffic table
 traffic_table = configuration['traffic_table']
 trafficTableName = configuration['traffic_table_name']
 outTrafficFullName = '/data/out/tables/' + trafficTableName + '.csv'
-outDestinationTraffic = 'ex_cxense_traffic'
+outDestinationTraffic = trafficTableName
 
 request_username = configuration['request_username']
 request_secret = configuration['#request_secret']
@@ -83,12 +83,13 @@ if __name__ == "__main__":
     site_df = pd.DataFrame(site_df_list, columns=site_df_columns)
     site_df = site_df.set_index('site_id')
     
-    out_site_table = pd.DataFrame.to_string(site_df)
+    #out_site_table = pd.DataFrame.to_string(site_df)
 
     if site_table == "True":
-        file = open(outSiteFullName,'w')  
-        file.write(out_site_table)
-        file.close()
+        site_df.to_csv(path_or_buf=outSiteFullName, index=False) 
+        #file = open(outSiteFullName,'w')  
+        #file.write(out_site_table)
+        #file.close()
 
     if traffic_table == "True":
 #  --------------------------------------------------------------------------------------------------------------------------------
@@ -307,8 +308,9 @@ if __name__ == "__main__":
         # TRAFFIC OUT
         #print("count tables", len(list_tables))
         traffic_tables = pd.concat(list_tables)
+        traffic_tables.to_csv(path_or_buf=outTrafficFullName, index=False) 
         #print("count traffic tables", len(traffic_tables))
-        out_traffic_table = pd.DataFrame.to_string(traffic_tables)
-        file = open(outTrafficFullName,'w')  
-        file.write(out_traffic_table)
-        file.close()
+        #out_traffic_table = pd.DataFrame.to_string(traffic_tables)
+        #file = open(outTrafficFullName,'w')  
+        #file.write(out_traffic_table)
+        #file.close()
