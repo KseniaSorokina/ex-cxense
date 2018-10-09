@@ -12,12 +12,6 @@ import numpy as np
 import itertools
 import keboola
 from keboola import docker
-
-
-def load_config(directory):
-    cfg = docker.Config(directory)
-    configuration = cfg.get_parameters()
-    return configuration
  
 def cx_api(path, obj, username, secret):
     date = datetime.datetime.utcnow().isoformat() + "Z"
@@ -32,19 +26,32 @@ def cx_api(path, obj, username, secret):
     connection.close()
     return status, responseObj
 
-configuration = load_config('/data/')
+
+cfg = docker.Config('/data/')
+configuration = cfg.get_parameters()
+
+# site table
+site_table = configuration['site_table']
+outSiteFullName = '/data/out/tables/' + 'site' + '.csv'
+outDestinationSite = 'ex_cxense_site'
+
+# traffic table
+traffic_table = configuration['traffic_table']
+trafficTableName = configuration['traffic_table_name']
+outTrafficFullName = '/data/out/tables/' + trafficTableName + '.csv'
+outDestinationTraffic = 'ex_cxense_traffic'
 
 request_username = configuration['request_username']
-request_secret = configuration['request_secret']
+request_secret = configuration['#request_secret']
 trtaffic_request_stop = configuration['trtaffic_request_stop'] 
 trtaffic_request_start = configuration['trtaffic_request_start']
-traffic_request_historyResolution = configuration['traffic_request_historyResolution']
-main_traffic_groups_list = configuration['main_traffic_groups_list']
+traffic_request_historyResolution = configuration['traffic_request_history_resolution']
+main_traffic_groups_list = configuration['traffic_filters']
 traffic_request_groups = configuration['traffic_request_groups']
 traffic_request_method = configuration['traffic_request_method']
 
-site_table = configuration['site_table']
-traffic_table = configuration['traffic_table']
+cfg.write_table_manifest(outSiteFullName, destination=outDestinationSite, primary_key=['site_id'], incremental=True)
+cfg.write_table_manifest(outTrafficFullName, destination=outDestinationTraffic, primary_key=['id'], incremental=True)
 
 if __name__ == "__main__":
     username = request_username
@@ -77,18 +84,18 @@ if __name__ == "__main__":
     site_df = site_df.set_index('site_id')
     
     out_site_table = pd.DataFrame.to_string(site_df)
-    
+
     if site_table == "True":
-        file = open('sites','w')  
+        file = open(outSiteFullName,'w')  
         file.write(out_site_table)
         file.close()
 
     if traffic_table == "True":
 #  --------------------------------------------------------------------------------------------------------------------------------
+# TRAFFIC EVENT API CALL (for name of groups items) 
         list_tables = []
         for siteId in site_ids:     
             #print("SITE ID", siteId)
-            # TRAFFIC EVENT API CALL (for name of groups items)
             traffic_event_request = (cx_api("/traffic/event", {
                                         "siteId" : siteId,  
                                         "stop": trtaffic_request_stop,
@@ -121,8 +128,8 @@ if __name__ == "__main__":
                 for event_item in event_group['items']:
                     traffic_event_value = event_item['item']
                     traffic_event_group_item_dict.setdefault(traffic_event_key, []).append(traffic_event_value)
-        #  --------------------------------------------------------------------------------------------------------------------------------
-            # TRAFFIC API CALLs
+#  --------------------------------------------------------------------------------------------------------------------------------
+# TRAFFIC API CALLs
 
             # traffic event or traffic custom
             if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
@@ -302,7 +309,6 @@ if __name__ == "__main__":
         traffic_tables = pd.concat(list_tables)
         #print("count traffic tables", len(traffic_tables))
         out_traffic_table = pd.DataFrame.to_string(traffic_tables)
-        file = open('traffic_table','w')  
+        file = open(outTrafficFullName,'w')  
         file.write(out_traffic_table)
         file.close()
-    
