@@ -50,9 +50,6 @@ main_traffic_groups_list = configuration['traffic_filters']
 traffic_request_groups = configuration['traffic_request_groups']
 traffic_request_method = configuration['traffic_request_method']
 
-cfg.write_table_manifest(outSiteFullName, destination=outDestinationSite, primary_key=['site_id'], incremental=True)
-cfg.write_table_manifest(outTrafficFullName, destination=outDestinationTraffic, primary_key=['id'], incremental=True)
-
 if __name__ == "__main__":
     username = request_username
     secret   = request_secret
@@ -84,6 +81,7 @@ if __name__ == "__main__":
     site_df = site_df.set_index('site_id')
 
     if site_table == "True":
+        cfg.write_table_manifest(outSiteFullName, destination=outDestinationSite, primary_key=['site_id'], incremental=True)
         site_df.to_csv(path_or_buf=outSiteFullName) 
 
     if traffic_table == "True":
@@ -303,5 +301,6 @@ if __name__ == "__main__":
         # TRAFFIC OUT
         #print("count tables", len(list_tables))
         traffic_tables = pd.concat(list_tables)
+        cfg.write_table_manifest(outTrafficFullName, destination=outDestinationTraffic, primary_key=['id'], incremental=True)
         traffic_tables.to_csv(path_or_buf=outTrafficFullName) 
     
