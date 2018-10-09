@@ -43,8 +43,8 @@ outDestinationTraffic = trafficTableName
 
 request_username = configuration['request_username']
 request_secret = configuration['#request_secret']
-trtaffic_request_stop = configuration['trtaffic_request_stop'] 
-trtaffic_request_start = configuration['trtaffic_request_start']
+traffic_request_stop = configuration['traffic_request_stop'] 
+traffic_request_start = configuration['traffic_request_start']
 traffic_request_historyResolution = configuration['traffic_request_history_resolution']
 main_traffic_groups_list = configuration['traffic_filters']
 traffic_request_groups = configuration['traffic_request_groups']
@@ -82,14 +82,9 @@ if __name__ == "__main__":
 
     site_df = pd.DataFrame(site_df_list, columns=site_df_columns)
     site_df = site_df.set_index('site_id')
-    
-    #out_site_table = pd.DataFrame.to_string(site_df)
 
     if site_table == "True":
         site_df.to_csv(path_or_buf=outSiteFullName) 
-        #file = open(outSiteFullName,'w')  
-        #file.write(out_site_table)
-        #file.close()
 
     if traffic_table == "True":
 #  --------------------------------------------------------------------------------------------------------------------------------
@@ -99,8 +94,8 @@ if __name__ == "__main__":
             #print("SITE ID", siteId)
             traffic_event_request = (cx_api("/traffic/event", {
                                         "siteId" : siteId,  
-                                        "stop": trtaffic_request_stop,
-                                        "start": trtaffic_request_start,
+                                        "stop": traffic_request_stop,
+                                        "start": traffic_request_start,
                                         "historyResolution": traffic_request_historyResolution, 
                                         "groups":["deviceType",
                                                 "mobileBrand",
@@ -135,8 +130,8 @@ if __name__ == "__main__":
             # traffic event or traffic custom
             if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
                 traffic_request_template = {"siteId" : siteId,  
-                                            "stop": trtaffic_request_stop,
-                                            "start": trtaffic_request_start,
+                                            "stop": traffic_request_stop,
+                                            "start": traffic_request_start,
                                             "historyResolution": traffic_request_historyResolution, 
                                             "groups": traffic_request_groups,
                                             "fields":["events",
@@ -229,8 +224,8 @@ if __name__ == "__main__":
             # traffic keyword
             if traffic_request_method == "/traffic/keyword":
                 traffic_request_template = {"siteId" : siteId,  
-                                            "stop": trtaffic_request_stop,
-                                            "start": trtaffic_request_start,
+                                            "stop": traffic_request_stop,
+                                            "start": traffic_request_start,
                                             "historyResolution": traffic_request_historyResolution, 
                                             "groups": traffic_request_groups,
                                             "fields":["events",
@@ -309,8 +304,4 @@ if __name__ == "__main__":
         #print("count tables", len(list_tables))
         traffic_tables = pd.concat(list_tables)
         traffic_tables.to_csv(path_or_buf=outTrafficFullName) 
-        #print("count traffic tables", len(traffic_tables))
-        #out_traffic_table = pd.DataFrame.to_string(traffic_tables)
-        #file = open(outTrafficFullName,'w')  
-        #file.write(out_traffic_table)
-        #file.close()
+    
