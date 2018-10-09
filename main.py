@@ -32,7 +32,7 @@ def cx_api(path, obj, username, secret):
     connection.close()
     return status, responseObj
 
-configuration = load_config('data/')
+configuration = load_config('/data/')
 
 request_username = configuration['request_username']
 request_secret = configuration['request_secret']
