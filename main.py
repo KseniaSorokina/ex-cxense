@@ -86,7 +86,7 @@ if __name__ == "__main__":
     #out_site_table = pd.DataFrame.to_string(site_df)
 
     if site_table == "True":
-        site_df.to_csv(path_or_buf=outSiteFullName, index=False) 
+        site_df.to_csv(path_or_buf=outSiteFullName) 
         #file = open(outSiteFullName,'w')  
         #file.write(out_site_table)
         #file.close()
@@ -308,7 +308,7 @@ if __name__ == "__main__":
         # TRAFFIC OUT
         #print("count tables", len(list_tables))
         traffic_tables = pd.concat(list_tables)
-        traffic_tables.to_csv(path_or_buf=outTrafficFullName, index=False) 
+        traffic_tables.to_csv(path_or_buf=outTrafficFullName) 
         #print("count traffic tables", len(traffic_tables))
         #out_traffic_table = pd.DataFrame.to_string(traffic_tables)
         #file = open(outTrafficFullName,'w')  
