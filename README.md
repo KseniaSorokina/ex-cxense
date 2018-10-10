@@ -5,11 +5,11 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 
 ## Configuration:
 {
-⋅⋅⋅ "request_username": "",
-⋅⋅⋅ "#request_secret": "",
-⋅⋅⋅ "site_table": "",
-⋅⋅⋅ "traffic_table": "",
-⋅⋅*  "traffic_table_name": "",
+⋅⋅⋅"request_username": "",
+⋅⋅⋅"#request_secret": "",
+⋅⋅⋅"site_table": "",
+⋅⋅⋅"traffic_table": "",
+⋅⋅*"traffic_table_name": "",
 ⋅⋅*  “traffic_request_start": "",
 ⋅⋅*  “traffic_request_stop”: "",
 ⋅⋅*  "traffic_request_history_resolution": "",
