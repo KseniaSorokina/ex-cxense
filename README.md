@@ -24,7 +24,7 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 * Using this extractor, it is possible to obtain two types of tables:
   1. “Site” table, which describes all sites (columns: site_id, name, url, country). To get it, just write "site_table": “True”, If it is not necessary to obtain - "site_table": “False”.
 
-  2. Another type - “Traffic” table, just write "traffic_table": “True" to get it or "traffic_table": “False” - if it not needed. This type of table can be modified depending on which methods, groups and filters will be selected.
+  2. Another type - “Traffic” table, just write "traffic_table": “True" to get it or "traffic_table": “False” - if it not needed (other fields can be empty). This type of table can be modified depending on which methods, groups and filters will be selected.
 
 	  a) A table showing the values (“events”, "sessionStarts","sessionStops", "sessionBounces", "activeTime", 	"uniqueUsers", "urls") of groups separately. 
 	  (* groups: 
