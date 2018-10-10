@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # SITE API CALL
     site_request = (cx_api("/site", {
                                       }, username, secret))
-
+    #print(site_request)
     site_ids = [] #array of site_ids
 
     site_response_column_names = ['site_id', 'name', 'url', 'country']
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
                     traffic_request_template["filters"] = filters
                     resp = cx_api(traffic_request_method, traffic_request_template, username, secret)
-
+                    #print(resp)
                     dates = resp[1]['history']
                     #print("date range count,", len(range(len(dates) - 1)))
                     for j in range(len(dates) - 1):
@@ -198,7 +198,10 @@ if __name__ == "__main__":
                                 r_activeTime = item['historyData']['activeTime'][j]
                                 r_uniqueUsers = item['historyData']['uniqueUsers'][j]
                                 r_site = siteId 
-                                r_id = str(r_date) + str(r_group) + str(r_item) + str(r_site)
+                                if combination:
+                                    r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_site) + '-' + str(combination) 
+                                else:
+                                    r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_site) 
 
                                 values = [r_id, r_date, r_group, r_item, r_events, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_urls, r_site]
                                 #print('%s %s %s %s %s %s %s %s %s %s\n' % (r_date, r_group, r_item, r_events, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_urls))
@@ -280,7 +283,7 @@ if __name__ == "__main__":
                                 r_urls = item['historyData']['urls'][j]
                                 r_weight = item['historyData']['weight'][j]
                                 r_site = siteId 
-                                r_id = str(r_date) + str(r_group) + str(r_item) + str(r_site)
+                                r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_site) + '-' + str(combination)
 
                                 values = [r_id, r_date, r_group, r_item, r_events, r_urls, r_weight, r_site]
 
