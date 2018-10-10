@@ -12,6 +12,7 @@ import numpy as np
 import itertools
 import keboola
 from keboola import docker
+import time, socket
  
 def cx_api(path, obj, username, secret):
     date = datetime.datetime.utcnow().isoformat() + "Z"
@@ -25,6 +26,56 @@ def cx_api(path, obj, username, secret):
     responseObj = json.loads(response.read().decode('utf-8'))
     connection.close()
     return status, responseObj
+
+def pauseAndContinue(exceptionType, tries, e):
+    sleepTime = tries * tries * 10
+    print("Error of type '%s': %s. Trying again in %s seconds" % (exceptionType, e, sleepTime))
+    time.sleep(sleepTime)
+     
+def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5):
+    response = None
+    tries = 0
+    while (tries < maxTries):
+        tries += 1
+        try:
+            status, response = cx_api(path, requestObj, username, secret)
+        except socket.gaierror as e:
+            pauseAndContinue('socket.gaierror', tries, e)
+            continue
+        except TimeoutError as e:
+            pauseAndContinue('TimeoutError', tries, e)
+            continue
+        except ConnectionAbortedError as e:
+            pauseAndContinue('ConnectionAbortedError', tries, e)
+            continue
+        except ConnectionResetError as e:
+            pauseAndContinue('ConnectionResetError', tries, e)
+            continue
+        except ResourceWarning as e:
+            pauseAndContinue('ResourceWarning', tries, e)
+            continue
+        except Exception as e:
+            raise Exception('Unhandled connection error: "%s"' % str(e))
+         
+        try:
+            #errorHandling(status, response, errorMsg)
+            print(status)
+            break
+        except Exception as e:
+            errorText = None
+            if status == 401:
+                errorText = 'Request expired'
+            elif status == 500:
+                errorText = 'Error while processing request'   
+            elif status == 503:
+                errorText = 'Service Unavailable'
+            if errorText and errorText in str(e):
+                pauseAndContinue(errorText, tries, e)
+                continue
+            raise Exception(str(e))
+    if not response:
+        raise Exception(errorMsg)
+    return status, response
 
 
 cfg = docker.Config('/data/')
@@ -89,7 +140,7 @@ if __name__ == "__main__":
 # TRAFFIC EVENT API CALL (for name of groups items) 
         list_tables = []
         for siteId in site_ids:     
-            #print("SITE ID", siteId)
+            print("SITE ID", siteId)
             traffic_event_request = (cx_api("/traffic/event", {
                                         "siteId" : siteId,  
                                         "stop": traffic_request_stop,
@@ -127,6 +178,7 @@ if __name__ == "__main__":
 
             # traffic event or traffic custom
             if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
+
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
                                             "start": traffic_request_start,
@@ -167,9 +219,9 @@ if __name__ == "__main__":
                 df = pd.DataFrame(columns=df_columns)
                 row_index = 1
 
-                #print("PRODUCTS,", main_traffic_items_list)
+                print("PRODUCTS,", main_traffic_items_list)
                 for combination in itertools.product(*main_traffic_items_list):
-                    #print("combination ,", combination)
+                    print("combination ,", combination)
                     filters = []
 
                     for i in range(len(combination)):
@@ -177,16 +229,18 @@ if __name__ == "__main__":
                         filters.append(column_filter)
 
                     traffic_request_template["filters"] = filters
-                    resp = cx_api(traffic_request_method, traffic_request_template, username, secret)
+
+                    resp = execute(traffic_request_method, traffic_request_template, username, secret)
+                    
                     #print(resp)
                     dates = resp[1]['history']
-                    #print("date range count,", len(range(len(dates) - 1)))
+                    print("date range count,", len(range(len(dates) - 1)))
                     for j in range(len(dates) - 1):
-                        #print("groups count,", dates[j], len(resp[1]['groups']))
+                        print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
-                            #print("group items count,", group['group'], len(group['items']))
+                            print("group items count,", group['group'], len(group['items']))
                             for item in group['items']:
-                                #print("item,", item['item'])
+                                print("item,", item['item'])
                                 r_date = dates[j]
                                 r_group = group['group']
                                 r_item = item['item']
@@ -266,7 +320,8 @@ if __name__ == "__main__":
                         filters.append(column_filter)
 
                     traffic_request_template["filters"] = filters
-                    resp = cx_api(traffic_request_method, traffic_request_template, username, secret)
+
+                    resp = execute(traffic_request_method, traffic_request_template, username, secret)
 
                     dates = resp[1]['history']
                     #print("date range count,", len(range(len(dates) - 1)))
