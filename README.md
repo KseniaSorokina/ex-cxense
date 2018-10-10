@@ -1,9 +1,9 @@
 # ex-cxense
-Cxense extractor (Keboola Connection) -H2
+Cxense extractor (Keboola Connection)
 
 API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 
-##Configuration:
+## Configuration:
 {
   "request_username": "",
   "#request_secret": "",
@@ -18,7 +18,7 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
   "traffic_request_groups": [ ]
 }
 
-##Configuration description:
+## Configuration description:
 * “request_username”, “#request_secret" - Cxense username and password;
 
 * Using this extractor, it is possible to obtain two types of tables:
