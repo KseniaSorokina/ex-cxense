@@ -141,7 +141,8 @@ if __name__ == "__main__":
         list_tables = []
         for siteId in site_ids:     
             print("SITE ID", siteId)
-            traffic_event_request = (cx_api("/traffic/event", {
+
+            traffic_event_equest_template =  {
                                         "siteId" : siteId,  
                                         "stop": traffic_request_stop,
                                         "start": traffic_request_start,
@@ -164,7 +165,12 @@ if __name__ == "__main__":
                                                 "referrerSearchEngine",
                                                 "host"
                                                 ]
-                                        },username, secret))
+                                        }
+
+            if traffic_request_stop == "today":
+                del traffic_event_equest_template["stop"]
+
+            traffic_event_request = (cx_api("/traffic/event", traffic_event_equest_template ,username, secret))
 
             traffic_event_group_item_dict = {}   # dict with all groups and items
 
@@ -173,6 +179,7 @@ if __name__ == "__main__":
                 for event_item in event_group['items']:
                     traffic_event_value = event_item['item']
                     traffic_event_group_item_dict.setdefault(traffic_event_key, []).append(traffic_event_value)
+
 #  --------------------------------------------------------------------------------------------------------------------------------
 # TRAFFIC API CALLs
 
@@ -200,6 +207,9 @@ if __name__ == "__main__":
                                                             "uniqueUsers", 
                                                             "urls"
                                                             ]}
+
+                if traffic_request_stop == "today":
+                    del traffic_request_template["stop"]
 
                 main_traffic_items_list = [] # list with items of chosen groups
 
@@ -234,8 +244,10 @@ if __name__ == "__main__":
                     
                     #print(resp)
                     dates = resp[1]['history']
-                    print("date range count,", len(range(len(dates) - 1)))
-                    for j in range(len(dates) - 1):
+                    dates.pop(0)
+
+                    #print("date range count,", len(range(len(dates) - 1)))
+                    for j in range(len(dates)):
                         print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
                             print("group items count,", group['group'], len(group['items']))
@@ -278,6 +290,7 @@ if __name__ == "__main__":
 
             # traffic keyword
             if traffic_request_method == "/traffic/keyword":
+
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
                                             "start": traffic_request_start,
@@ -291,6 +304,9 @@ if __name__ == "__main__":
                                                                 "urls",
                                                                 "weight"
                                                             ]}
+
+                if traffic_request_stop == "today":
+                    del traffic_request_template["stop"]
 
                 main_traffic_items_list = [] # list with items of chosen groups
 
@@ -310,9 +326,9 @@ if __name__ == "__main__":
                 df = pd.DataFrame(columns=df_columns)
                 row_index = 1
 
-                #print("PRODUCTS,", main_traffic_items_list)
+                print("PRODUCTS,", main_traffic_items_list)
                 for combination in itertools.product(*main_traffic_items_list):
-                    #print("combination ,", combination)
+                    print("combination ,", combination)
                     filters = []
 
                     for i in range(len(combination)):
@@ -323,14 +339,17 @@ if __name__ == "__main__":
 
                     resp = execute(traffic_request_method, traffic_request_template, username, secret)
 
+                    #print(resp)
                     dates = resp[1]['history']
+                    dates.pop(0)
+
                     #print("date range count,", len(range(len(dates) - 1)))
-                    for j in range(len(dates) - 1):
-                        #print("groups count,", dates[j], len(resp[1]['groups']))
+                    for j in range(len(dates)):
+                        print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
-                            #print("group items count,", group['group'], len(group['items']))
+                            print("group items count,", group['group'], len(group['items']))
                             for item in group['items']:
-                                #print("item,", item['item'])
+                                print("item,", item['item'])
                                 r_date = dates[j]
                                 r_group = group['group']
                                 r_item = item['item']
@@ -361,4 +380,5 @@ if __name__ == "__main__":
         traffic_tables = pd.concat(list_tables)
         cfg.write_table_manifest(outTrafficFullName, destination=outDestinationTraffic, primary_key=['id'], incremental=True)
         traffic_tables.to_csv(path_or_buf=outTrafficFullName) 
-    
+
+ 
