@@ -31,11 +31,11 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 
 	  groups description: https://wiki.cxense.com/display/cust/Event+groups
 	  values description: https://wiki.cxense.com/display/cust/Cxense+Insight+Metrics
-
-	  “traffic_request_method": "/traffic/event",
+         ```
+        “traffic_request_method": "/traffic/event",
   	"traffic_filters": [ ],   (field is empty)
   	"traffic_request_groups": [ "deviceType", “mobileBrand”]     ( names of the necessary groups are enough to 			insert here)
-
+          ```
 
 	  b) A table showing the values (the same as table a) of groups mix (the same groups as table a)
 
