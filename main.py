@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
 #  --------------------------------------------------------------------------------------------------------------------------------
     # SITE API CALL
-    site_request = (cx_api("/site", {
+    site_request = (execute("/site", {
                                       }, username, secret))
     #print(site_request)
     site_ids = [] #array of site_ids
