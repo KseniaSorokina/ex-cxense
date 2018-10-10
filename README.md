@@ -1,5 +1,5 @@
 # ex-cxense
-Cxense extractor (Keboola Connection)
+Cxense extractor (Keboola Connection) -H2
 
 API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 
