@@ -27,7 +27,24 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
   2. Another type - “Traffic” table, just write "traffic_table": “True" to get it or "traffic_table": “False” - if it not needed. This type of table can be modified depending on which methods, groups and filters will be selected.
 
 	  a) A table showing the values (“events”, "sessionStarts","sessionStops", "sessionBounces", "activeTime", 	"uniqueUsers", "urls") of groups separately. 
-	  (groups: "deviceType", “mobileBrand”, “browser", "connectionSpeed", “resolution", “colorDepth", "site",  			"exitLinkHost", "exitLinkUrl", "postalCode", "city", “url", "referrerUrl", "referrerHost", "referrerHostClass", 	"referrerSocialNetwork", “referrerSearchEngine”). 
+	  (* groups: 
+	   * "deviceType", 
+	   * “mobileBrand”, 
+	   * “browser", 
+	   * "connectionSpeed", 
+	   * “resolution", 
+	   * “colorDepth", 
+	   * "site",  			
+	   * "exitLinkHost", 
+	   * "exitLinkUrl", 
+	   * "postalCode", 
+	   * "city", 
+	   * “url", 
+	   * "referrerUrl", 
+	   * "referrerHost", 
+	   * "referrerHostClass", 	
+	   * "referrerSocialNetwork", 
+	   * “referrerSearchEngine”). 
 
 	  groups description: https://wiki.cxense.com/display/cust/Event+groups
 	  values description: https://wiki.cxense.com/display/cust/Cxense+Insight+Metrics
