@@ -93,6 +93,8 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 
 * “traffic_request_start”, “traffic_request_stop” - start and stop period
 Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specification; it is possible to use "today" in “traffic_request_stop”. 
-For example: (“traffic_request_start”: "-1d", “traffic_request_stop”: "today")
+	For example:
+	+ “traffic_request_start”: "-1d", 
+	+ “traffic_request_stop”: "today"
 
 * “traffic_request_history_resolution” ("month", "week", "day", "hour" and “minute")
