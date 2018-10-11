@@ -48,7 +48,7 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 	   * "referrerSocialNetwork", 
 	   * “referrerSearchEngine”). 
 
-	 groups description: https://wiki.cxense.com/display/cust/Event+groups
+	 groups description: https://wiki.cxense.com/display/cust/Event+groups (all of these groups is possible to use)
 	 values description: https://wiki.cxense.com/display/cust/Cxense+Insight+Metrics
 
  	 - “traffic_request_method": "/traffic/event",
