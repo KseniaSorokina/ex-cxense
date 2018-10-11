@@ -84,13 +84,13 @@ configuration = cfg.get_parameters()
 # site table
 site_table = configuration['site_table']
 outSiteFullName = '/data/out/tables/' + 'site' + '.csv'
-outDestinationSite = 'in.c-' + configuration['output_bucket_name'] + '.site'
+outDestinationSite = 'site'
 
 # traffic table
 traffic_table = configuration['traffic_table']
 trafficTableName = configuration['traffic_table_name']
 outTrafficFullName = '/data/out/tables/' + trafficTableName + '.csv'
-outDestinationTraffic = 'in.c-' + configuration['output_bucket_name'] + '.' + trafficTableName
+outDestinationTraffic = trafficTableName
 
 request_username = configuration['request_username']
 request_secret = configuration['#request_secret']
