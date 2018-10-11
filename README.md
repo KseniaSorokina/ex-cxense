@@ -46,8 +46,8 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 	   * "referrerSocialNetwork", 
 	   * “referrerSearchEngine”). 
 
-	          ### groups description: https://wiki.cxense.com/display/cust/Event+groups
-	          ### values description: https://wiki.cxense.com/display/cust/Cxense+Insight+Metrics
+	    - groups description: https://wiki.cxense.com/display/cust/Event+groups
+	    - values description: https://wiki.cxense.com/display/cust/Cxense+Insight+Metrics
 
  	 - “traffic_request_method": "/traffic/event",
  	 - "traffic_filters": [ ],   (field is empty)
