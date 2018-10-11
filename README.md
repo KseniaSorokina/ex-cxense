@@ -51,44 +51,44 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 	groups description: https://wiki.cxense.com/display/cust/Event+groups (all of these groups is possible to use)
 	values description: https://wiki.cxense.com/display/cust/Cxense+Insight+Metrics
 
- 	 - “traffic_request_method": "/traffic/event",
- 	 - "traffic_filters": [ ],   (field is empty)
- 	 - "traffic_request_groups": [ "deviceType", “mobileBrand”]     ( names of the necessary groups are enough to 			insert here)
+ 	- “traffic_request_method": "/traffic/event",
+ 	- "traffic_filters": [ ],   (field is empty)
+ 	- "traffic_request_groups": [ "deviceType", “mobileBrand”]     ( names of the necessary groups are enough to 			insert here)
 
 
-	  b) A table showing the values (the same as table a) of groups mix (the same groups as table a)
+	 b) A table showing the values (the same as table a) of groups mix (the same groups as table a)
 
-	  documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169348 
-	  - “traffic_request_method": "/traffic/event",
-  	  - "traffic_filters": ["deviceType", “mobileBrand”],    (names of the necessary groups are enough to insert here; at the same time it is better to take a small number of groups)
-	  - "traffic_request_groups": ["site”] 
+	 documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169348 
+	 - “traffic_request_method": "/traffic/event",
+  	 - "traffic_filters": ["deviceType", “mobileBrand”],(names of the necessary groups are enough to insert here; at the same time it is better to take a small number of groups)
+	 - "traffic_request_groups": ["site”] 
 
 
-	  c) A table showing the values (the same as table a) of groups mix (the same groups as table a + “template”) 
+	 c) A table showing the values (the same as table a) of groups mix (the same groups as table a + “template”) 
 	
-	  documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169350
+	 documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169350
 
-	  - “traffic_request_method": "/traffic/custom",
-  	  - "traffic_filters": ["deviceType", “mobileBrand”],   (names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
-  	  - "traffic_request_groups": ["template”] 
-
-
-	  d) A table showing the values (“events“, “urls”, “weight”) of groups mix (the same groups as table a + 	"category") 
-
-	  documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169352
-
-	  - “traffic_request_method": "/traffic/keyword",
-  	  - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
-  	  - "traffic_request_groups": ["category"]
+	 - “traffic_request_method": "/traffic/custom",
+  	 - "traffic_filters": ["deviceType", “mobileBrand”],   (names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
+  	 - "traffic_request_groups": ["template”] 
 
 
-	  e) A table showing the values (“events“, “urls”, “weight”) of groups mix (the same groups as table a + 	"taxonomy") 
+	 d) A table showing the values (“events“, “urls”, “weight”) of groups mix (the same groups as table a + 	"category") 
 
-	  documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169352
+	 documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169352
 
-	  - “traffic_request_method": "/traffic/keyword",
-  	  - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
-  	  - "traffic_request_groups": ["taxonomy"]
+	 - “traffic_request_method": "/traffic/keyword",
+  	 - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
+  	 - "traffic_request_groups": ["category"]
+
+
+	 e) A table showing the values (“events“, “urls”, “weight”) of groups mix (the same groups as table a + 	"taxonomy") 
+
+	 documentation: https://wiki.cxense.com/pages/viewpage.action?pageId=21169352
+
+	 - “traffic_request_method": "/traffic/keyword",
+  	 - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
+  	 - "traffic_request_groups": ["taxonomy"]
 
 
 * “traffic_request_start”, “traffic_request_stop” - start and stop period
