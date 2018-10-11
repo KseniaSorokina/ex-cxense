@@ -3,7 +3,7 @@ Cxense extractor (Keboola Connection)
 
 API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 
-This extractor is not public, to find it just put /kds.ex-cxense to the end of url (for example: https://connection.eu-central-1.keboola.com/..../extractors/kds.ex-cxense
+This extractor is not public, to find it just put /kds.ex-cxense to the end of url (for example: https://connection.eu-central-1.keboola.com/..../extractors/kds.ex-cxense)
 
 ## Configuration:
 {
