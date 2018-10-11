@@ -170,7 +170,7 @@ if __name__ == "__main__":
             if traffic_request_stop == "today":
                 del traffic_event_equest_template["stop"]
 
-            traffic_event_request = (cx_api("/traffic/event", traffic_event_equest_template ,username, secret))
+            traffic_event_request = (execute("/traffic/event", traffic_event_equest_template ,username, secret))
 
             traffic_event_group_item_dict = {}   # dict with all groups and items
 
