@@ -114,8 +114,12 @@ if __name__ == "__main__":
 
     site_response_column_names = ['site_id', 'name', 'url', 'country']
     site_df_columns = []
-    for site_col in site_response_column_names:
-        site_df_columns.append(site_col)
+    try:
+        for site_col in site_response_column_names:
+            site_df_columns.append(site_col)
+    except:
+        print("Invalid credentials")
+        exit(1)
 
     site_df_list = []
     for site in site_request[1]['sites']:
@@ -174,12 +178,15 @@ if __name__ == "__main__":
 
             traffic_event_group_item_dict = {}   # dict with all groups and items
 
-            for event_group in traffic_event_request[1]['groups']:
-                traffic_event_key = event_group['group']
-                for event_item in event_group['items']:
-                    traffic_event_value = event_item['item']
-                    traffic_event_group_item_dict.setdefault(traffic_event_key, []).append(traffic_event_value)
-
+            try:
+                for event_group in traffic_event_request[1]['groups']:
+                    traffic_event_key = event_group['group']
+                    for event_item in event_group['items']:
+                        traffic_event_value = event_item['item']
+                        traffic_event_group_item_dict.setdefault(traffic_event_key, []).append(traffic_event_value)
+            except:
+                print("Invalid credentials")
+                exit(1)
 #  --------------------------------------------------------------------------------------------------------------------------------
 # TRAFFIC API CALLs
 
