@@ -123,6 +123,13 @@ if __name__ == "__main__":
         exit(1)
 
     site_df_list = []
+
+    try:
+        site_request[1]['sites']
+    except:
+        print("Invalid request_username or request_secret")
+        exit(1)
+
     for site in site_request[1]['sites']:
         site_id = site['id']
         site_name = site['name']
