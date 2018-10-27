@@ -154,35 +154,17 @@ if __name__ == "__main__":
         for siteId in site_ids:     
             print("SITE ID", siteId)
 
-            traffic_event_equest_template =  {
+            traffic_event_request_template =  {
                                         "siteId" : siteId,  
                                         "stop": traffic_request_stop,
                                         "start": traffic_request_start,
-                                        "historyResolution": traffic_request_historyResolution, 
-                                        "groups":["deviceType",
-                                                "mobileBrand",
-                                                "browser", 
-                                                "connectionSpeed", 
-                                                "resolution",
-                                                "colorDepth", 
-                                                "exitLinkHost", 
-                                                "exitLinkUrl",   
-                                                "postalCode", 
-                                                "city",   
-                                                "url",  
-                                                "referrerUrl", 
-                                                "referrerHost", 
-                                                "referrerHostClass", 
-                                                "referrerSocialNetwork", 
-                                                "referrerSearchEngine",
-                                                "host"
-                                                ]
+                                        "historyResolution": traffic_request_historyResolution
                                         }
 
             if traffic_request_stop == "today":
-                del traffic_event_equest_template["stop"]
+                del traffic_event_request_template["stop"]
 
-            traffic_event_request = (execute("/traffic/event", traffic_event_equest_template ,username, secret))
+            traffic_event_request = (execute("/traffic/event", traffic_event_request_template ,username, secret))
 
             traffic_event_group_item_dict = {}   # dict with all groups and items
 
@@ -197,7 +179,7 @@ if __name__ == "__main__":
                 exit(1)
 #  --------------------------------------------------------------------------------------------------------------------------------
 # TRAFFIC API CALLs
-
+            
             # traffic event or traffic custom
             if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
 
@@ -300,7 +282,6 @@ if __name__ == "__main__":
                 traffic_tab = df.set_index('id')
                 #print(traffic_table)
                 list_tables.append(traffic_tab)
-
 
 
             # traffic keyword
