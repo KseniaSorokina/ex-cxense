@@ -154,6 +154,9 @@ if __name__ == "__main__":
         for siteId in site_ids:     
             print("SITE ID", siteId)
 
+            if traffic_request_stop == "today":
+                traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
+
             traffic_event_request_template =  {
                                         "siteId" : siteId,  
                                         "stop": traffic_request_stop,
@@ -161,8 +164,6 @@ if __name__ == "__main__":
                                         "historyResolution": traffic_request_historyResolution
                                         }
 
-            if traffic_request_stop == "today":
-                del traffic_event_request_template["stop"]
 
             traffic_event_request = (execute("/traffic/event", traffic_event_request_template ,username, secret))
 
@@ -182,6 +183,9 @@ if __name__ == "__main__":
             
             # traffic event or traffic custom
             if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
+
+                if traffic_request_stop == "today":
+                    traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
 
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
@@ -204,9 +208,6 @@ if __name__ == "__main__":
                                                             "uniqueUsers", 
                                                             "urls"
                                                             ]}
-
-                if traffic_request_stop == "today":
-                    del traffic_request_template["stop"]
 
                 main_traffic_items_list = [] # list with items of chosen groups
 
@@ -241,10 +242,10 @@ if __name__ == "__main__":
                     
                     #print(resp)
                     dates = resp[1]['history']
-                    dates.pop(0)
+                    #dates.pop(0)
 
                     #print("date range count,", len(range(len(dates) - 1)))
-                    for j in range(len(dates)):
+                    for j in range(len(dates - 1)):
                         print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
                             print("group items count,", group['group'], len(group['items']))
@@ -287,6 +288,9 @@ if __name__ == "__main__":
             # traffic keyword
             if traffic_request_method == "/traffic/keyword":
 
+                if traffic_request_stop == "today":
+                    traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
+
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
                                             "start": traffic_request_start,
@@ -301,8 +305,6 @@ if __name__ == "__main__":
                                                                 "weight"
                                                             ]}
 
-                if traffic_request_stop == "today":
-                    del traffic_request_template["stop"]
 
                 main_traffic_items_list = [] # list with items of chosen groups
 
@@ -337,10 +339,10 @@ if __name__ == "__main__":
 
                     #print(resp)
                     dates = resp[1]['history']
-                    dates.pop(0)
+                    #dates.pop(0)
 
                     #print("date range count,", len(range(len(dates) - 1)))
-                    for j in range(len(dates)):
+                    for j in range(len(dates) - 1):
                         print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
                             print("group items count,", group['group'], len(group['items']))
