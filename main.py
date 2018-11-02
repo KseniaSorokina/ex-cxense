@@ -245,7 +245,7 @@ if __name__ == "__main__":
                     #dates.pop(0)
 
                     #print("date range count,", len(range(len(dates) - 1)))
-                    for j in range(len(dates - 1)):
+                    for j in range(len(dates) - 1):
                         print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
                             print("group items count,", group['group'], len(group['items']))
