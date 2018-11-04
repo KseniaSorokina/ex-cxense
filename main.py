@@ -13,6 +13,8 @@ import itertools
 import keboola
 from keboola import docker
 import time, socket
+from datetime import timedelta
+from dateutil.relativedelta import *
  
 def cx_api(path, obj, username, secret):
     date = datetime.datetime.utcnow().isoformat() + "Z"
@@ -76,6 +78,22 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
     if not response:
         raise Exception(errorMsg)
     return status, response
+
+def new_date(string):
+    numbers = string[1:-1]
+    if string[-1:] == "d":
+        d = datetime.datetime.today() - timedelta(days=int(numbers))
+    elif string[-1:] == "w":
+        d = datetime.datetime.today() - timedelta(weeks=int(numbers))
+    elif string[-1:] == "M":
+        d = datetime.datetime.today() - relativedelta(months=+int(numbers))
+    elif string[-1:] == "y":
+        d = datetime.datetime.today() - relativedelta(years=+int(numbers))
+    else:
+        return(string)
+
+    day = d.strftime('%Y-%m-%d')
+    return(day)
 
 
 cfg = docker.Config('/data/')
@@ -155,7 +173,9 @@ if __name__ == "__main__":
             print("SITE ID", siteId)
 
             if traffic_request_stop == "today":
-                traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
+                traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
+            
+            traffic_request_start = new_date(traffic_request_start)
 
             traffic_event_request_template =  {
                                         "siteId" : siteId,  
@@ -163,6 +183,9 @@ if __name__ == "__main__":
                                         "start": traffic_request_start,
                                         "historyResolution": traffic_request_historyResolution
                                         }
+
+            if traffic_request_stop == "now":
+                del traffic_request_template['stop']
 
 
             traffic_event_request = (execute("/traffic/event", traffic_event_request_template ,username, secret))
@@ -185,7 +208,9 @@ if __name__ == "__main__":
             if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
 
                 if traffic_request_stop == "today":
-                    traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
+                    traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
+
+                traffic_request_start = new_date(traffic_request_start)
 
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
@@ -208,6 +233,9 @@ if __name__ == "__main__":
                                                             "uniqueUsers", 
                                                             "urls"
                                                             ]}
+
+                if traffic_request_stop == "now":
+                    del traffic_request_template['stop']
 
                 main_traffic_items_list = [] # list with items of chosen groups
 
@@ -291,6 +319,8 @@ if __name__ == "__main__":
                 if traffic_request_stop == "today":
                     traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
 
+                traffic_request_start = new_date(traffic_request_start)
+
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
                                             "start": traffic_request_start,
@@ -305,6 +335,8 @@ if __name__ == "__main__":
                                                                 "weight"
                                                             ]}
 
+                if traffic_request_stop == "now":
+                    del traffic_request_template['stop']
 
                 main_traffic_items_list = [] # list with items of chosen groups
 
