@@ -176,6 +176,7 @@ if __name__ == "__main__":
                 traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
             
             traffic_request_start = new_date(traffic_request_start)
+            traffic_request_stop = new_date(traffic_request_stop)
 
             traffic_event_request_template =  {
                                         "siteId" : siteId,  
@@ -211,6 +212,7 @@ if __name__ == "__main__":
                     traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
 
                 traffic_request_start = new_date(traffic_request_start)
+                traffic_request_stop = new_date(traffic_request_stop)
 
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
@@ -320,6 +322,7 @@ if __name__ == "__main__":
                     traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
 
                 traffic_request_start = new_date(traffic_request_start)
+                traffic_request_stop = new_date(traffic_request_stop)
 
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
@@ -377,7 +380,7 @@ if __name__ == "__main__":
                     for j in range(len(dates) - 1):
                         print("groups count,", dates[j], len(resp[1]['groups']))
                         for group in resp[1]['groups']:
-                            print("group items count,", group['group'], len(group['items']))
+                            print("group items count,", group['group'], len(group['items']))     
                             for item in group['items']:
                                 print("item,", item['item'])
                                 r_date = dates[j]
