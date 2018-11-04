@@ -80,14 +80,15 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
     return status, response
 
 def new_date(string):
-    numbers = string[1:-1]
-    if string[-1:] == "d" and string[1:] == "-":
+    new_string = str(string)
+    numbers = new_string[1:-1]
+    if new_string[-1:] == "d" and string[1:] == "-":
         d = datetime.datetime.today() - timedelta(days=int(numbers))
-    elif string[-1:] == "w" and string[1:] == "-":
+    elif new_string[-1:] == "w" and string[1:] == "-":
         d = datetime.datetime.today() - timedelta(weeks=int(numbers))
-    elif string[-1:] == "M" and string[1:] == "-":
+    elif new_string[-1:] == "M" and string[1:] == "-":
         d = datetime.datetime.today() - relativedelta(months=+int(numbers))
-    elif string[-1:] == "y" and string[1:] == "-":
+    elif new_string[-1:] == "y" and string[1:] == "-":
         d = datetime.datetime.today() - relativedelta(years=+int(numbers))
     else:
         return(string)
@@ -118,6 +119,8 @@ traffic_request_historyResolution = configuration['traffic_request_history_resol
 main_traffic_groups_list = configuration['traffic_filters']
 traffic_request_groups = configuration['traffic_request_groups']
 traffic_request_method = configuration['traffic_request_method']
+
+
 
 
 if __name__ == "__main__":
@@ -271,7 +274,11 @@ if __name__ == "__main__":
                     resp = execute(traffic_request_method, traffic_request_template, username, secret)
                     
                     #print(resp)
-                    dates = resp[1]['history']
+                    try:
+                        dates = resp[1]['history']
+                    except:
+                        print("Invalid credentials")
+                        exit(1)
                     #dates.pop(0)
 
                     #print("date range count,", len(range(len(dates) - 1)))
@@ -373,7 +380,11 @@ if __name__ == "__main__":
                     resp = execute(traffic_request_method, traffic_request_template, username, secret)
 
                     #print(resp)
-                    dates = resp[1]['history']
+                    try:
+                        dates = resp[1]['history']
+                    except:
+                        print("Invalid credentials")
+                        exit(1)
                     #dates.pop(0)
 
                     #print("date range count,", len(range(len(dates) - 1)))
