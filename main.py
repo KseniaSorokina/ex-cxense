@@ -81,13 +81,13 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
 
 def new_date(string):
     numbers = string[1:-1]
-    if string[-1:] == "d":
+    if string[-1:] == "d" and string[1:] == "-":
         d = datetime.datetime.today() - timedelta(days=int(numbers))
-    elif string[-1:] == "w":
+    elif string[-1:] == "w" and string[1:] == "-":
         d = datetime.datetime.today() - timedelta(weeks=int(numbers))
-    elif string[-1:] == "M":
+    elif string[-1:] == "M" and string[1:] == "-":
         d = datetime.datetime.today() - relativedelta(months=+int(numbers))
-    elif string[-1:] == "y":
+    elif string[-1:] == "y" and string[1:] == "-":
         d = datetime.datetime.today() - relativedelta(years=+int(numbers))
     else:
         return(string)
@@ -186,7 +186,7 @@ if __name__ == "__main__":
                                         }
 
             if traffic_request_stop == "now":
-                del traffic_request_template['stop']
+                del traffic_event_request_template['stop']
 
 
             traffic_event_request = (execute("/traffic/event", traffic_event_request_template ,username, secret))
