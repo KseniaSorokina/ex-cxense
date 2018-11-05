@@ -100,28 +100,30 @@ def new_date(string):
 cfg = docker.Config('/data/')
 configuration = cfg.get_parameters()
 
-# site table
-site_table = configuration['site_table']
-outSiteFullName = '/data/out/tables/' + 'site' + '.csv'
-outDestinationSite = 'site'
+try:
+    # site table
+    site_table = configuration['site_table']
+    outSiteFullName = '/data/out/tables/' + 'site' + '.csv'
+    outDestinationSite = 'site'
 
-# traffic table
-traffic_table = configuration['traffic_table']
-trafficTableName = configuration['traffic_table_name']
-outTrafficFullName = '/data/out/tables/' + trafficTableName + '.csv'
-outDestinationTraffic = trafficTableName
+    # traffic table
+    traffic_table = configuration['traffic_table']
+    trafficTableName = configuration['traffic_table_name']
+    outTrafficFullName = '/data/out/tables/' + trafficTableName + '.csv'
+    outDestinationTraffic = trafficTableName
 
-request_username = configuration['request_username']
-request_secret = configuration['#request_secret']
-traffic_request_stop = configuration['traffic_request_stop'] 
-traffic_request_start = configuration['traffic_request_start']
-traffic_request_historyResolution = configuration['traffic_request_history_resolution']
-main_traffic_groups_list = configuration['traffic_filters']
-traffic_request_groups = configuration['traffic_request_groups']
-traffic_request_method = configuration['traffic_request_method']
-
-
-
+    request_username = configuration['request_username']
+    request_secret = configuration['#request_secret']
+    traffic_request_stop = configuration['traffic_request_stop'] 
+    traffic_request_start = configuration['traffic_request_start']
+    traffic_request_historyResolution = configuration['traffic_request_history_resolution']
+    main_traffic_groups_list = configuration['traffic_filters']
+    traffic_request_groups = configuration['traffic_request_groups']
+    traffic_request_method = configuration['traffic_request_method']
+    site_ids_filter = configuration['site_ids_filter']
+except:
+    print("Please complete the missing part of the configuration")
+    exit(1)
 
 if __name__ == "__main__":
     username = request_username
@@ -172,7 +174,19 @@ if __name__ == "__main__":
 #  --------------------------------------------------------------------------------------------------------------------------------
 # TRAFFIC EVENT API CALL (for name of groups items) 
         list_tables = []
-        for siteId in site_ids:     
+
+        if isinstance(site_ids_filter, list) == True:
+            main_site_ids = site_ids_filter
+        if site_ids_filter == "False":
+            main_site_ids = site_ids
+
+        try:
+            main_site_ids
+        except:
+            print("Invalid credentials")
+            exit(1)
+
+        for siteId in main_site_ids:     
             print("SITE ID", siteId)
 
             if traffic_request_stop == "today":
