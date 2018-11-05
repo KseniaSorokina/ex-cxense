@@ -100,14 +100,14 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 
 * “traffic_request_start”, “traffic_request_stop” - start and stop period
 Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specification; 
-	Terms of use:
+	*Terms of use:
 	+ it is possible to use "today" and "now" in “traffic_request_stop”;
 	+ "today": used when downloading data for days, weeks, months, and years (for example “-1d”, “-1w”, “-1M”, “-1y”) --> the data will be downloaded from the beginning of the day
 	+ "now": used when downloading data for seconds, hours or minutes(for example “-1s”, “-1m”, “-1h”) --> the data will be downloaded from the current time
 	+ everything else works the same as written in the documentation
-	Warring:
+	*Warring:
 	+ it is not possible to use the same date in “traffic_request_start”, “traffic_request_stop”
-	Example of “traffic_request_start”, “traffic_request_stop” uses:
+	*Example of “traffic_request_start”, “traffic_request_stop” uses:
 	+ "traffic_request_start": “-1d“,
         + "traffic_request_stop": “today”
 	+ if today is 2018-10-31 --> the table will show the start date of the period, which is 2018-10-30 00:00	
