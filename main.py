@@ -82,13 +82,15 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
 def new_date(string):
     new_string = str(string)
     numbers = new_string[1:-1]
-    if new_string[-1:] == "d" and string[1:] == "-":
+    if new_string == "now":
+        return(string)
+    elif new_string[-1:] == "d":
         d = datetime.datetime.today() - timedelta(days=int(numbers))
-    elif new_string[-1:] == "w" and string[1:] == "-":
+    elif new_string[-1:] == "w":
         d = datetime.datetime.today() - timedelta(weeks=int(numbers))
-    elif new_string[-1:] == "M" and string[1:] == "-":
+    elif new_string[-1:] == "M":
         d = datetime.datetime.today() - relativedelta(months=+int(numbers))
-    elif new_string[-1:] == "y" and string[1:] == "-":
+    elif new_string[-1:] == "y":
         d = datetime.datetime.today() - relativedelta(years=+int(numbers))
     else:
         return(string)
@@ -191,9 +193,11 @@ if __name__ == "__main__":
 
             if traffic_request_stop == "today":
                 traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
-            
+            else:
+                traffic_request_stop = new_date(traffic_request_stop)
+
             traffic_request_start = new_date(traffic_request_start)
-            traffic_request_stop = new_date(traffic_request_stop)
+        
 
             traffic_event_request_template =  {
                                         "siteId" : siteId,  
@@ -223,13 +227,7 @@ if __name__ == "__main__":
 # TRAFFIC API CALLs
             
             # traffic event or traffic custom
-            if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
-
-                if traffic_request_stop == "today":
-                    traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
-
-                traffic_request_start = new_date(traffic_request_start)
-                traffic_request_stop = new_date(traffic_request_stop)
+            if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):    
 
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
@@ -338,12 +336,6 @@ if __name__ == "__main__":
 
             # traffic keyword
             if traffic_request_method == "/traffic/keyword":
-
-                if traffic_request_stop == "today":
-                    traffic_request_stop  = datetime.datetime.today().strftime('%Y-%m-%d')
-
-                traffic_request_start = new_date(traffic_request_start)
-                traffic_request_stop = new_date(traffic_request_stop)
 
                 traffic_request_template = {"siteId" : siteId,  
                                             "stop": traffic_request_stop,
