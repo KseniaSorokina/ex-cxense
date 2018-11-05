@@ -12,6 +12,7 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 - "site_table": "",
 - "traffic_table": "",
 - "traffic_table_name": "",
+- "site_ids_filter": [],
 - “traffic_request_start": "",
 - “traffic_request_stop”: "",
 - "traffic_request_history_resolution": "",
@@ -89,6 +90,12 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 	 - “traffic_request_method": "/traffic/keyword",
   	 - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
   	 - "traffic_request_groups": ["taxonomy"]
+	 
+	 
+* "site_ids_filter" - filter for specific sitе ids
+	2 options:
+	+ "site_ids_filter": [“”, “”, ….] - opportunity to specify the interesting site ids
+	+ ”site_ids_filter": “False” - (without parentheses) which allows to download data for all site ids
 
 
 * “traffic_request_start”, “traffic_request_stop” - start and stop period
