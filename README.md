@@ -108,7 +108,7 @@ Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specificat
 	+ b) Warring:
 	+ it is not possible to use the same date in “traffic_request_start”, “traffic_request_stop”
 	+ c) Example of “traffic_request_start”, “traffic_request_stop” uses:
-	+ "traffic_request_start": “-1d“,
+	+ "traffic_request_start": “-1d“
         + "traffic_request_stop": “today”
 	+ if today is 2018-10-31 --> the table will show the start date of the period, which is 2018-10-30 00:00	
 
