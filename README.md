@@ -13,6 +13,7 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 - "traffic_table": "",
 - "traffic_table_name": "",
 - "site_ids_filter": [],
+- "user_ids": "True",
 - “traffic_request_start": "",
 - “traffic_request_stop”: "",
 - "traffic_request_history_resolution": "",
@@ -96,7 +97,11 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
 	2 options:
 	+ "site_ids_filter": [“”, “”, ….] - opportunity to specify the interesting site ids
 	+ ”site_ids_filter": “False” - (without parentheses) which allows to download data for all site ids
-
+	
+* "user_ids" - for writing of user ids
+	2 options:
+	+ "True" - table with user ids
+	+ "False" - table without user ids
 
 * “traffic_request_start”, “traffic_request_stop” - start and stop period
 Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specification; 
