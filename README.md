@@ -92,6 +92,12 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
   	 - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
   	 - "traffic_request_groups": ["taxonomy"]
 	 
+	 f) A table showing the values (“events“, “urls”, “weight”) of groups mix (the same groups as table a + selected custom dimensions, which it is possible to find in "Site Content"). For example:
+	 
+	 - “traffic_request_method": "/traffic/keyword",
+  	 - "traffic_filters": ["deviceType", “mobileBrand”],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
+  	 - "traffic_request_groups": ["entity", vlp-brand", ....]  (custom dimensions)
+	 
 	 
 * "site_ids_filter" - filter for specific sitе ids
 	2 options:
