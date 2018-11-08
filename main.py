@@ -224,7 +224,7 @@ if __name__ == "__main__":
                 print("Invalid credentials")
                 exit(1)
 
-            print("traffic_event_group_item_dict: ", traffic_event_group_item_dict)
+            #print("traffic_event_group_item_dict: ", traffic_event_group_item_dict)
 #  --------------------------------------------------------------------------------------------------------------------------------
 # TRAFFIC API CALLs
             if user_ids == "False":
@@ -287,7 +287,7 @@ if __name__ == "__main__":
 
                         resp = execute(traffic_request_method, traffic_request_template, username, secret)
                         
-                        print(resp)
+                        #print(resp)
                         try:
                             dates = resp[1]['history']
                         except:
@@ -455,7 +455,7 @@ if __name__ == "__main__":
                     print("Invalid credentials")
                     exit(1)
 
-                print("traffic_user_dict: ", traffic_user_dict)
+                print("users: ", traffic_user_dict)
 
 #  --------------------------------------------------------------------------------------------------------------------------------
 # TRAFFIC API CALLs + USERS
@@ -528,12 +528,13 @@ if __name__ == "__main__":
                                 filters.append(column_filter)
 
                             print("filters: ", filters)
+                            print("user_filter: ", u_filter)
 
                             traffic_request_template["filters"] = filters
 
                             resp = execute(traffic_request_method, traffic_request_template, username, secret)
 
-                            print(resp)
+                            #print(resp)
 
                             try:
                                 dates = resp[1]['history']
@@ -641,11 +642,12 @@ if __name__ == "__main__":
                                 filters.append(column_filter)
 
                             print("filters: ", filters)
+                            print("user_filter: ", u_filter)
 
                             traffic_request_template["filters"] = filters
 
                             resp = execute(traffic_request_method, traffic_request_template, username, secret)
-                            print(resp)
+                            #print(resp)
 
                             try:
                                 dates = resp[1]['history']
