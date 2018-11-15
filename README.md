@@ -5,6 +5,9 @@ API documentation: https://wiki.cxense.com/display/cust/Cxense+Insight+API
 
 This extractor is not public, to find it just put /kds.ex-cxense to the end of url (for example: https://connection.eu-central-1.keboola.com/..../extractors/kds.ex-cxense)
 
+* sometimes results may vary:
+Our systems are designed for high availability and will sometime return numbers that can be slightly different when executed several times. Realtime requests for recent data for periods of seconds or minutes can sometimes see incomplete data, due to the nature of the internet and that events will enter our systems out-of-order. All data sent to our systems will eventually be counted, usually within 1 second, but can sometimes lag a little behind.We also keep several redundant clusters of servers in a shared-nothing setup, where historic data can differ slightly over time. The difference is usually less than 0.001% and is usually only seen on high traffic sites. This should be negligible error margin, and much smaller than other factors on the internet. This has usually to do with our de-duplication algorithm of events, which can miss when two duplicates arrive at different points in time. (https://wiki.cxense.com/pages/viewpage.action?pageId=21169346)
+
 ## Configuration:
 {
 - "request_username": "", 
