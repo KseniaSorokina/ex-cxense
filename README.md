@@ -85,18 +85,18 @@ This extractor is not public, to find it just put /kds.ex-cxense to the end of u
   	 - "traffic_request_groups": ["category", ...] (custom dimensions)
 	 - WARRING: metrics as "uniqueUsers","sessionStarts", "sessionStops", "sessionBounces", "activeTime" sometimes is "Null". Тhis is due to the fact that to recover these metrics is used another method "/traffic/event" as a backend (which is less powerfull than "/traffic/keyword")
 
-* "request_for_set_of_sites" - returns metrics for selected set of sites
+* "request_for_set_of_sites" - returns metrics for selected set of sites;
 	2 options:
 	+ "True" - table with set of sites
 	+ "False" - table with separate sites 
 	 
-* "site_ids_filter" - filter for specific sitе ids
+* "site_ids_filter" - filter for specific sitе ids;
 	3 options:
 	+ "site_ids_filter": [“”, “”, ….] - opportunity to specify the interesting site ids
 	+ ”site_ids_filter": “False” - (without parentheses) which allows to download data for all site ids
 	+ ”site_ids_filter": “All” - can use only with "request_for_set_of_sites": "True"
 	
-* "user_ids" - for writing of user ids
+* "user_ids" - for writing of user ids;
 	2 options:
 	+ "True" - table with user ids
 	+ "False" - table without user ids
