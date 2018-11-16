@@ -97,7 +97,8 @@ def new_date(string):
         d = datetime.datetime.today() - relativedelta(years=+int(numbers))
     else:
         return(string)
-    day = d.strftime('%Y-%m-%d')
+
+    day = d.strftime('%Y-%m-%d' + 'T00:00:00.000+01:00')
     return(day)
 
 # --------------------------------------
@@ -130,6 +131,7 @@ def full_traffic_request_template(siteId,traffic_request_stop,traffic_request_st
                                         "uniqueUsers", 
                                         "urls"
                                         ]}
+    print(request_template)
     return(request_template)
 
 # --------------------------------------
@@ -154,6 +156,7 @@ def short_traffic_request_template(siteId,traffic_request_stop,traffic_request_s
                                             "urls",
                                             "weight"
                                         ]}
+    print(request_template)
     return(request_template)
 
 # --------------------------------------
@@ -222,7 +225,7 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
     if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"): 
         response_column_names = ['id', 'date', 'group', 'item', 'events', 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers', 'urls', 'siteId']
     if traffic_request_method == "/traffic/keyword":
-        response_column_names = ['id', 'date', 'group', 'item', 'events', 'urls', 'weight']
+        response_column_names = ['id', 'date', 'group', 'item', 'siteId', 'events', 'urls', 'weight']
 
     df_columns = []
     for col in main_traffic_groups_list:
@@ -302,7 +305,7 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
                     if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"): 
                         values = [r_id, r_date, r_group, r_item, r_events, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_urls, r_site]
                     if traffic_request_method == "/traffic/keyword":
-                        values = [r_id, r_date, r_group, r_item, r_events, r_urls, r_weight]
+                        values = [r_id, r_date, r_group, r_item, r_site, r_events, r_urls, r_weight]
 
                     arr = []
                     for val in combination:
@@ -383,7 +386,7 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
 
             traffic_request_method = "/traffic/event"
             resp = execute(traffic_request_method, traffic_request_template, username, secret)
-            #print("resp: ",resp)
+            print("resp: ",resp)
             print("traffic_request_template: ", traffic_request_template)
 
             try:
@@ -455,7 +458,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
     if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"): 
         response_column_names = ['id', 'date', 'group', 'item', 'userGroup', 'userId', 'events', 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers', 'urls', 'siteId']
     if traffic_request_method == "/traffic/keyword":
-        response_column_names = ['id', 'date', 'group','item', 'userGroup', 'userId', 'events', 'urls', 'weight']
+        response_column_names = ['id', 'date', 'group','item', 'userGroup', 'userId', 'siteId', 'events', 'urls', 'weight']
 
     df_columns = []
     for col in main_traffic_groups_list:
@@ -543,7 +546,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
                         if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
                             values = [r_id, r_date, r_group, r_item, r_user_group, r_user_id, r_events, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_urls, r_site]
                         if traffic_request_method == "/traffic/keyword":
-                            values = [r_id, r_date, r_group, r_item, r_user_group, r_user_id, r_events, r_urls, r_weight]
+                            values = [r_id, r_date, r_group, r_item, r_user_group, r_user_id, r_site, r_events, r_urls, r_weight]
 
                         arr = []
                         for val in combination:
@@ -784,7 +787,7 @@ if __name__ == "__main__":
 
         # traffic_request_stop
         if traffic_request_stop == "today":
-            traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d')
+            traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d' + 'T00:00:00.000+01:00')
         else:
             traffic_request_stop = new_date(traffic_request_stop)
         # traffic_request_start
