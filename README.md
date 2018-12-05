@@ -116,6 +116,7 @@ Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specificat
 	+ c) Example of “traffic_request_start”, “traffic_request_stop” uses:
 	+ "traffic_request_start": “-1d“
 	+ "traffic_request_stop": “today”
-	+ if today is 2018-10-31 --> the table will show the start date of the period, which is 2018-10-30 00:00	
+	+ if today is 2018-10-31 --> the table will show the start date of the period, which is 2018-10-30 00:00
+	+ timestamp for Prague '2018-10-31T00:00:00.000+01:00'
 
 * “traffic_request_history_resolution” ("month", "week", "day", "hour" and “minute")
