@@ -1,7 +1,11 @@
 '''
 Python 3
-'''
-  
+
+Extractor can create 2 tables in one run:
+1) site table (always the same)
+2) traffic table (it is possible to choose a variant from several tables)
+
+''' 
 import datetime
 import hashlib
 import hmac
@@ -17,6 +21,10 @@ from datetime import timedelta
 from dateutil.relativedelta import *
 
 # --------------------------------------
+'''
+Running API Functions from within a Python 3.x Script: https://wiki.cxense.com/display/cust/The+Cxense+API+Tutorial
+
+'''
 def cx_api(path, obj, username, secret):
     date = datetime.datetime.utcnow().isoformat() + "Z"
     signature = hmac.new(secret.encode('utf-8'), date.encode('utf-8'), digestmod=hashlib.sha256).hexdigest()
@@ -31,12 +39,15 @@ def cx_api(path, obj, username, secret):
     return status, responseObj
 
 # --------------------------------------
+'''
+Error Handling and Retries: https://wiki.cxense.com/display/cust/The+Cxense+API+Tutorial
+
+'''
 def pauseAndContinue(exceptionType, tries, e):
     sleepTime = tries * tries * 10
     print("Error of type '%s': %s. Trying again in %s seconds" % (exceptionType, e, sleepTime))
     time.sleep(sleepTime)
-
-# --------------------------------------     
+   
 def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5):
     response = None
     tries = 0
@@ -82,6 +93,18 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
     return status, response
 
 # --------------------------------------
+'''
+Def valid for "traffic_request_stop" and "traffic_request_start". 
+It helps to convert for example "-1d" to datetime, which could use in api call.
+Datetime automatically convert to Prague tz (GMT+1).
+
+String could be for example:
+1) "-1d" - yesterday
+2) "-1w" - last week
+3) "-1M" - last mounth
+4) "-1y" - last year
+
+'''
 def new_date(string):
     new_string = str(string)
     numbers = new_string[1:-1]
@@ -102,8 +125,19 @@ def new_date(string):
     return(day)
 
 # --------------------------------------
-# FULL REQUEST TEMPLATE
+'''
+FULL REQUEST TEMPLATE
 
+Template, which is part of traffic api call request.
+It is full, because it returns all metrics as: "events", "sessionStarts", "sessionStops", "sessionBounces", "activeTime", "uniqueUsers", "urls".
+
+Used in the following defs:
+- traffic_tab_without_users
+- keyword_tab_without_users
+- traffic_tab_with_users
+- keyword_tab_with_users
+
+'''
 def full_traffic_request_template(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,traffic_request_groups):
     if isinstance(siteId, list) == False:
         siteId = [siteId]
@@ -135,8 +169,17 @@ def full_traffic_request_template(siteId,traffic_request_stop,traffic_request_st
     return(request_template)
 
 # --------------------------------------
-# SHORT REQUEST TEMPLATE
+'''
+SHORT REQUEST TEMPLATE
 
+Template, which is part of traffic api call request.
+It is short, because it returns only metrics as: "events", "urls", "weight".
+
+Used in the following defs:
+- traffic_tab_without_users
+- traffic_tab_with_users
+
+'''
 def short_traffic_request_template(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,traffic_request_groups):
     if isinstance(siteId, list) == False:
         siteId = [siteId]
@@ -160,8 +203,17 @@ def short_traffic_request_template(siteId,traffic_request_stop,traffic_request_s
     return(request_template)
 
 # --------------------------------------
-# DICTIONARY
+'''
+DICTIONARY REQUEST
 
+Next part of traffic api call request. 
+
+It can be chosen using the method:
+1) t_method="event" - "/traffic/event" method (https://wiki.cxense.com/pages/viewpage.action?pageId=21169348)
+2) t_method="user" - "/traffic/user" method (https://wiki.cxense.com/pages/viewpage.action?pageId=28049834)
+3) t_method="keyword" - "/traffic/keyword" method (https://wiki.cxense.com/pages/viewpage.action?pageId=21169352)
+
+'''
 def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method):
 
     if isinstance(siteId, list) == False:
@@ -203,8 +255,13 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
     return(traffic_dict)
 
 # --------------------------------------
-# KEYWORD - EVENT - CUSTOM; WITHOUT USERS
+'''
+KEYWORD - EVENT - CUSTOM RESPONSE; WITHOUT USERS
 
+One of four traffic api call responses.
+This def generate traffic table without user filter.
+
+'''
 def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter):
 
     if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"): 
@@ -212,6 +269,9 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
     if traffic_request_method == "/traffic/keyword":
         traffic_request_template = short_traffic_request_template(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,traffic_request_groups)
 
+    '''
+    If "traffic_request_stop": "now" - the stop field is removed from the request, it means that the end time of the response will be this second. 
+    '''
     if traffic_request_stop == "now":
         del traffic_request_template['stop']
 
@@ -241,6 +301,9 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
         print("combination ,", combination)
         filters = []
 
+        '''
+        event filter; used when the field "traffic_filters" in the configuration is not empty.
+        '''
         for i in range(len(combination)):
             column_filter = {"type":"event", "group":main_traffic_groups_list[i], "item":combination[i]}
             filters.append(column_filter)
@@ -331,14 +394,22 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
     return(traffic_tab,resp)
 
 # --------------------------------------
-# KEYWORD + KEYWORD; WITHOUT USERS
+'''
+KEYWORD + KEYWORD RESPONSE; WITHOUT USERS
 
+One of four traffic api call responses.
+This def generate traffic table without user filter, but with keyword filter.
+
+'''
 def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter,keyword_dict):
 
     traffic_request_groups = ["site"]
 
     traffic_request_template = full_traffic_request_template(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,traffic_request_groups)
     
+    '''
+    If "traffic_request_stop": "now" - the stop field is removed from the request, it means that the end time of the response will be this second. 
+    '''
     if traffic_request_stop == "now":
         del traffic_request_template['stop']
 
@@ -360,6 +431,9 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
     df = pd.DataFrame(columns=df_columns)
     row_index = 1
 
+    '''
+    keyword filter; used to get missing metrics ("uniqueUsers","sessionStarts", "sessionStops", "sessionBounces", "activeTime"). Values are taken from the configuration field "traffic_request_groups".
+    '''
     keyword_filters = []
     for key, value in keyword_dict.items():
         for v in value:
@@ -375,6 +449,9 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
             filters = []
             filters.append(k_filter)
 
+            '''
+            event filter; used when the field "traffic_filters" in the configuration is not empty.
+            '''
             for i in range(len(combination)):
                 column_filter = {"type":"event", "group":main_traffic_groups_list[i], "item":combination[i]}
                 filters.append(column_filter)
@@ -436,8 +513,13 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
     return(traffic_tab)
 
 # --------------------------------------
-# WITH USERS 
+'''
+KEYWORD - EVENT - CUSTOM RESPONSE; WITH USERS 
 
+One of four traffic api call responses.
+This def generate traffic table with user filter.
+
+'''
 def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter):
 
     if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"): 
@@ -445,6 +527,9 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
     if traffic_request_method == "/traffic/keyword":
         traffic_request_template = short_traffic_request_template(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,traffic_request_groups)
 
+    '''
+    If "traffic_request_stop": "now" - the stop field is removed from the request, it means that the end time of the response will be this second. 
+    '''
     if traffic_request_stop == "now":
         del traffic_request_template['stop']
 
@@ -469,6 +554,9 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
     df = pd.DataFrame(columns=df_columns)
     row_index = 1
 
+    '''
+    user filter; from traffic_response_dict(), t_method="user"
+    '''
     user_filters = []
     for key, value in traffic_user_dict.items():
         for v in value:
@@ -484,6 +572,9 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
             filters = []
             filters.append(u_filter)
 
+            '''
+            event filter; used when the field "traffic_filters" in the configuration is not empty.
+            '''
             for i in range(len(combination)):
                 column_filter = {"type":"event", "group":main_traffic_groups_list[i], "item":combination[i]}
                 filters.append(column_filter)
@@ -572,14 +663,22 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
     return(traffic_tab,resp)
 
 # --------------------------------------
-# KEYWORD + KEYWORD; WITH USERS
+'''
+KEYWORD + KEYWORD; WITH USERS
 
+One of four traffic api call responses.
+This def generate traffic table with user filter and with keyword filtr.
+
+'''
 def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter,keyword_dict):
 
     traffic_request_groups = ["site"]
 
     traffic_request_template = full_traffic_request_template(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,traffic_request_groups)
-   
+
+    '''
+    If "traffic_request_stop": "now" - the stop field is removed from the request, it means that the end time of the response will be this second. 
+    '''
     if traffic_request_stop == "now":
         del traffic_request_template['stop']
 
@@ -601,6 +700,9 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
     df = pd.DataFrame(columns=df_columns)
     row_index = 1
 
+    '''
+    keyword filter; used to get missing metrics ("uniqueUsers","sessionStarts", "sessionStops", "sessionBounces", "activeTime"). Values are taken from the configuration field "traffic_request_groups".
+    '''
     keyword_filters = []
     for key, value in keyword_dict.items():
         for v in value:
@@ -610,6 +712,9 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
 
     for k_filter in keyword_filters:
 
+        '''
+        user filter; from traffic_response_dict(), t_method="user"
+        '''
         user_filters = []
         for key, value in traffic_user_dict.items():
             for v in value:
@@ -625,7 +730,10 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
                 filters = []
                 filters.append(u_filter)
                 filters.append(k_filter)
-
+                
+                '''
+                event filter; used when the field "traffic_filters" in the configuration is not empty.
+                '''
                 for i in range(len(combination)):
                     column_filter = {"type":"event", "group":main_traffic_groups_list[i], "item":combination[i]}
                     filters.append(column_filter)
@@ -689,9 +797,13 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
 
     return(traffic_tab)  
 
-# ---------------------------------------------------------------------
-# MAIN PART
+# --------------------------------------------------------------------------------------------------------
+'''
+MAIN PART 
 
+(main script starts here)
+
+'''
 cfg = docker.Config('/data/')
 configuration = cfg.get_parameters()
 
@@ -730,8 +842,13 @@ if __name__ == "__main__":
     username = request_username
     secret   = request_secret
 
-#  --------------------------------------------------------------------------------------------------------------------------------
-# SITE API CALL
+
+    '''
+    SITE API CALL 
+
+    (site table creates here)
+
+    '''
     site_request = (execute("/site", {
                                       }, username, secret))
     site_ids = [] #array of site_ids
@@ -766,13 +883,21 @@ if __name__ == "__main__":
     site_df = pd.DataFrame(site_df_list, columns=site_df_columns)
     site_df = site_df.set_index('site_id')
 
+    '''
+    out site table
+    '''
     if site_table == "True":
         cfg.write_table_manifest(outSiteFullName, destination=outDestinationSite, primary_key=['site_id'], incremental=True)
         site_df.to_csv(path_or_buf=outSiteFullName) 
 
+
+    '''
+    TRAFFIC EVENT API CALLs 
+
+    (traffic table creates here)
+
+    '''
     if traffic_table == "True":
-#  --------------------------------------------------------------------------------------------------------------------------------
-# TRAFFIC EVENT API CALLs 
 
         if isinstance(site_ids_filter, list) == True:
             main_site_ids = site_ids_filter
@@ -795,6 +920,9 @@ if __name__ == "__main__":
 
         list_tables = []
 
+        '''
+        One response for all chosen sites.
+        '''
         if request_for_set_of_sites == "False":
         
             for siteId in main_site_ids:     
@@ -802,10 +930,17 @@ if __name__ == "__main__":
 
                 traffic_event_group_item_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="event")
 
+                '''
+                One response for all chosen sites without user filter.
+                '''
                 if user_ids == "False":
                     
                     traffic_tab, resp = traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
                 
+                    '''
+                    If traffic request method "/traffic/keyword"(https://wiki.cxense.com/pages/viewpage.action?pageId=21169352), we are using "/traffic/event" method with keyword filter to response 
+                    metrics as 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers'. Then we are join traffic_tab and keyword_tab.
+                    '''
                     if traffic_request_method == "/traffic/keyword":
                         keyword_dict = {}
                         for k_group in resp[1]['groups']:
@@ -822,6 +957,9 @@ if __name__ == "__main__":
                     list_tables.append(traffic_tab)
                     traffic_tables = pd.concat(list_tables)
 
+                '''
+                One response for all chosen sites with user filter.
+                '''
                 if user_ids == "True":
                     
                     traffic_user_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="user")
@@ -829,6 +967,10 @@ if __name__ == "__main__":
 
                     traffic_tab,resp = traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
 
+                    '''
+                    If traffic request method "/traffic/keyword"(https://wiki.cxense.com/pages/viewpage.action?pageId=21169352), we are using "/traffic/event" method with keyword filter to response 
+                    metrics as 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers'. Then we are join traffic_tab and keyword_tab.
+                    '''
                     if traffic_request_method == "/traffic/keyword":
                         keyword_dict = {}
                         for k_group in resp[1]['groups']:
@@ -845,16 +987,26 @@ if __name__ == "__main__":
                     list_tables.append(traffic_tab)
                     traffic_tables = pd.concat(list_tables)
 
+        '''
+        Separate response for all chosen sites.
+        '''
         if request_for_set_of_sites == "True":
             siteId = main_site_ids
             print("SITE IDs", siteId)
 
             traffic_event_group_item_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="event")
 
+            '''
+            Separate response for all chosen sites without user filter.
+            '''
             if user_ids == "False":
                     
                 traffic_tab, resp = traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
 
+                '''
+                If traffic request method "/traffic/keyword"(https://wiki.cxense.com/pages/viewpage.action?pageId=21169352), we are using "/traffic/event" method with keyword filter to response 
+                metrics as 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers'. Then we are join traffic_tab and keyword_tab.
+                '''
                 if traffic_request_method == "/traffic/keyword":
                     keyword_dict = {}
                     for k_group in resp[1]['groups']:
@@ -873,6 +1025,9 @@ if __name__ == "__main__":
                 list_tables.append(traffic_tab)
                 traffic_tables = pd.concat(list_tables)
 
+            '''
+            Separate response for all chosen sites with user filter.
+            '''
             if user_ids == "True":
                     
                 traffic_user_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="user")
@@ -880,6 +1035,10 @@ if __name__ == "__main__":
 
                 traffic_tab,resp = traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
 
+                '''
+                If traffic request method "/traffic/keyword"(https://wiki.cxense.com/pages/viewpage.action?pageId=21169352), we are using "/traffic/event" method with keyword filter to response 
+                metrics as 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers'. Then we are join traffic_tab and keyword_tab.
+                '''
                 if traffic_request_method == "/traffic/keyword":
                     keyword_dict = {}
                     for k_group in resp[1]['groups']:
@@ -897,9 +1056,10 @@ if __name__ == "__main__":
 
                 list_tables.append(traffic_tab)
                 traffic_tables = pd.concat(list_tables)
-#  -------------------------------------------------------------------------------------------------------------------------------- 
-# # TRAFFIC OUT
 
+        '''
+        out traffic table
+        '''
         traffic_tables = traffic_tables.fillna("Null")
         cfg.write_table_manifest(outTrafficFullName, destination=outDestinationTraffic, primary_key=['id'], incremental=True)
         traffic_tables.to_csv(path_or_buf=outTrafficFullName) 
