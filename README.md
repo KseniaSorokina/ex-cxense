@@ -19,17 +19,20 @@ Our systems are designed for high availability and will sometime return numbers 
 - "traffic_table_name": "",
 - "request_for_set_of_sites": "",
 - "site_ids_filter": [ ],
-- "user_ids": "True",
+- "user_ids": "",
+- "user_ids_limit": ""
 - “traffic_request_start": "",
 - “traffic_request_stop”: "",
 - "traffic_request_history_resolution": "",
 - "traffic_request_method": "",
 - "traffic_filters": [ ],
-- "traffic_request_groups": [ ]
+- "traffic_request_groups": [ ],
+- "traffic_filters_limit": "",
+- "traffic_request_groups_limit": ""
 }
 
 ## Configuration description:
-* “request_username”, “#request_secret" - Cxense username and password;
+* “request_username”, “#request_secret" - Cxense username and secret;
 
 * Using this extractor, it is possible to obtain two types of tables:
   1. “Site” table, which describes all sites (columns: site_id, name, url, country). To get it, just write "site_table": “True”, If it is not necessary to obtain - "site_table": “False”.
@@ -88,7 +91,7 @@ Our systems are designed for high availability and will sometime return numbers 
 	 - “traffic_request_method": "/traffic/keyword",
   	 - "traffic_filters": ["deviceType", “mobileBrand”, ...],    ( names of the necessary groups are enough to insert here; at 		the same time it is better to take a small number of groups)
   	 - "traffic_request_groups": ["category", ...] (custom dimensions)
-	 - WARRING: metrics as "uniqueUsers","sessionStarts", "sessionStops", "sessionBounces", "activeTime" sometimes is "Null". Тhis is due to the fact that to recover these metrics is used another method "/traffic/event" as a backend (which is less powerfull than "/traffic/keyword")
+	 - warning: metrics as "uniqueUsers","sessionStarts", "sessionStops", "sessionBounces", "activeTime" sometimes is "Null". Тhis is due to the fact that to recover these metrics is used another method "/traffic/event" as a backend (which is less powerfull than "/traffic/keyword")
 
 * "request_for_set_of_sites" - returns metrics for selected set of sites;
 	2 options:
@@ -99,12 +102,19 @@ Our systems are designed for high availability and will sometime return numbers 
 	3 options:
 	+ "site_ids_filter": [“”, “”, ….] - opportunity to specify the interesting site ids
 	+ ”site_ids_filter": “False” - (without parentheses) which allows to download data for all site ids
-	+ ”site_ids_filter": “All” - can use only with "request_for_set_of_sites": "True"
+	+ ”site_ids_filter": “All” - can use only with "request_for_set_of_sites": "True". (out table will be labeled as ALL + number of sites participating in the queries).
 	
 * "user_ids" - for writing of user ids;
 	2 options:
 	+ "True" - table with user ids
 	+ "False" - table without user ids
+
+* "user_ids_limit" - limit for "user_ids". It works only with "user_ids": "True" (for "user_ids": "False" - "user_ids_limit" may contain anything, but it is important leave it in the configuration).
+	2 options:
+	+ "your_number" (for example "100") - max limit = 1000
+	+ "False" - limit by default = 10
+	+ warning: 
+	+ if the limit is greater than 100, the extractor will run for a longer period of time.
 
 * “traffic_request_start”, “traffic_request_stop” - start and stop period
 Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specification; 
@@ -113,7 +123,7 @@ Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specificat
 	+ "today": used when downloading data for days, weeks, months, and years (for example “-1d”, “-1w”, “-1M”, “-1y”) --> the data will be downloaded from the beginning of the day
 	+ "now": used when downloading data for seconds, hours or minutes(for example “-1s”, “-1m”, “-1h”) --> the data will be downloaded from the current time
 	+ everything else works the same as written in the documentation	
-	+ b) WARRING:
+	+ b) warning:
 	+ it is not possible to use the same date in “traffic_request_start”, “traffic_request_stop”
 	+ c) Example of “traffic_request_start”, “traffic_request_stop” uses:
 	+ "traffic_request_start": “-1d“
@@ -122,3 +132,17 @@ Time specification: https://wiki.cxense.com/display/cust/Traffic+time+specificat
 	+ timestamp for Prague '2018-10-31T00:00:00.000+01:00'
 
 * “traffic_request_history_resolution” ("month", "week", "day", "hour" and “minute")
+
+* "traffic_filters_limit" - limit for "traffic_filters". 
+	2 options:
+	+ "your_number" (for example "100") - max limit = 1000
+	+ "False" - limit by default = 10
+	+ warning: 
+	+ if the limit is greater than 100, the extractor will run for a longer period of time.
+	
+* "traffic_request_groups_limit" - limit for "traffic_request_groups". 
+	2 options:
+	+ "your_number" (for example "100") - max limit = 1000
+	+ "False" - limit by default = 10
+	+ warning : 
+	+ if the limit is greater than 100, the extractor will run for a longer period of time.
