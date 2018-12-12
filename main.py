@@ -149,6 +149,7 @@ def full_traffic_request_template(siteId,traffic_request_stop,traffic_request_st
                         "start": traffic_request_start,
                         "historyResolution": traffic_request_historyResolution, 
                         "groups": traffic_request_groups,
+                        "count": traffic_request_groups_limit,
                         "fields":["events",
                                 "sessionStarts",
                                 "sessionStops", 
@@ -191,6 +192,7 @@ def short_traffic_request_template(siteId,traffic_request_stop,traffic_request_s
                         "start": traffic_request_start,
                         "historyResolution": traffic_request_historyResolution, 
                         "groups": traffic_request_groups,
+                        "count": traffic_request_groups_limit,
                         "fields":["events",
                                     "urls",
                                     "weight"
@@ -211,7 +213,6 @@ Next part of traffic api call request.
 It can be chosen using the method:
 1) t_method="event" - "/traffic/event" method (https://wiki.cxense.com/pages/viewpage.action?pageId=21169348)
 2) t_method="user" - "/traffic/user" method (https://wiki.cxense.com/pages/viewpage.action?pageId=28049834)
-3) t_method="keyword" - "/traffic/keyword" method (https://wiki.cxense.com/pages/viewpage.action?pageId=21169352)
 
 '''
 def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method):
@@ -221,22 +222,23 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
     else:
         siteId = siteId
 
+    if t_method == "event":
+        method = "/traffic/event"
+        limit = traffic_filters_limit
+    if t_method == "user":
+        method = "/traffic/user"
+        limit = user_ids_limit
+
     traffic_template =  {
                         "siteIds" : siteId,  
                         "stop": traffic_request_stop,
                         "start": traffic_request_start,
-                        "historyResolution": traffic_request_historyResolution
+                        "historyResolution": traffic_request_historyResolution,
+                        "count": limit
                         }
 
     if traffic_request_stop == "now":
         del traffic_template['stop']
-
-    if t_method == "event":
-        method = "/traffic/event"
-    if t_method == "user":
-        method = "/traffic/user"
-    if t_method == "keyword":
-        method = "/traffic/keyword"
 
     traffic_response = (execute(method, traffic_template ,username, secret))
 
@@ -585,7 +587,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
             traffic_request_template["filters"] = filters
 
             resp = execute(traffic_request_method, traffic_request_template, username, secret)
-            #print(resp)
+            #print("resp: ", resp)
 
             try:
                 dates = resp[1]['history']
@@ -650,7 +652,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
 
     traffic_tab = df.set_index('id')
     
-    if ("site" in traffic_request_groups) and (traffic_request_method == "/traffic/event") and (request_for_set_of_sites == "True"):
+    if ("site" in traffic_request_groups) and (traffic_request_method == "/traffic/event") and (request_for_set_of_sites == "True") and (df.empty == False):
         df['item'] = str(r_site)
         df = df.set_index('id')
         df1 = df.groupby(df.index)['events', 'sessionStarts', 'sessionStops', 'sessionBounces', 'activeTime', 'uniqueUsers', 'urls'].sum().reset_index()
@@ -830,6 +832,10 @@ try:
     site_ids_filter = configuration['site_ids_filter']
     user_ids = configuration['user_ids']
     request_for_set_of_sites = configuration['request_for_set_of_sites']
+    traffic_filters_limit = configuration['traffic_filters_limit']
+    user_ids_limit = configuration['user_ids_limit']
+    traffic_request_groups_limit = configuration['traffic_request_groups_limit']
+
 except:
     print("Please complete the missing part of the configuration")
     exit(1)
@@ -837,6 +843,13 @@ except:
 if (site_ids_filter == "All") and (request_for_set_of_sites == "False"):
     print("Invalid credentials")
     exit(1)
+
+if user_ids_limit == "False":
+    user_ids_limit = 10
+if traffic_filters_limit == "False":
+    traffic_filters_limit = 10
+if traffic_request_groups_limit == "False":
+    traffic_request_groups_limit = 10
 
 if __name__ == "__main__":
     username = request_username
@@ -910,6 +923,24 @@ if __name__ == "__main__":
             print("Invalid credentials")
             exit(1)
 
+        '''
+        checking site ids for user ids
+        '''
+        if user_ids == "True":
+            new_site_ids = []
+            for site_for_test in main_site_ids:
+                dict_for_test = traffic_response_dict(site_for_test,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="user")
+                if bool(dict_for_test) == False:
+                    continue 
+                else:
+                    new_site_ids.append(site_for_test)
+                    print(site_for_test)
+            
+            main_site_ids = new_site_ids
+            if len(main_site_ids) == 0:
+                print("This site contains no user ids")
+                exit()
+
         # traffic_request_stop
         if traffic_request_stop == "today":
             traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d' + 'T00:00:00.000+01:00')
@@ -921,7 +952,7 @@ if __name__ == "__main__":
         list_tables = []
 
         '''
-        One response for all chosen sites.
+        Separate response for all chosen sites.
         '''
         if request_for_set_of_sites == "False":
         
@@ -931,7 +962,7 @@ if __name__ == "__main__":
                 traffic_event_group_item_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="event")
 
                 '''
-                One response for all chosen sites without user filter.
+                Separate response for all chosen sites without user filter.
                 '''
                 if user_ids == "False":
                     
@@ -958,14 +989,14 @@ if __name__ == "__main__":
                     traffic_tables = pd.concat(list_tables)
 
                 '''
-                One response for all chosen sites with user filter.
+                Separate response for all chosen sites with user filter.
                 '''
                 if user_ids == "True":
                     
                     traffic_user_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="user")
                     print("users: ", traffic_user_dict)
 
-                    traffic_tab,resp = traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
+                    traffic_tab, resp = traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
 
                     '''
                     If traffic request method "/traffic/keyword"(https://wiki.cxense.com/pages/viewpage.action?pageId=21169352), we are using "/traffic/event" method with keyword filter to response 
@@ -988,7 +1019,7 @@ if __name__ == "__main__":
                     traffic_tables = pd.concat(list_tables)
 
         '''
-        Separate response for all chosen sites.
+        One response for all chosen sites.
         '''
         if request_for_set_of_sites == "True":
             siteId = main_site_ids
@@ -997,7 +1028,7 @@ if __name__ == "__main__":
             traffic_event_group_item_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="event")
 
             '''
-            Separate response for all chosen sites without user filter.
+            One response for all chosen sites without user filter.
             '''
             if user_ids == "False":
                     
@@ -1026,14 +1057,14 @@ if __name__ == "__main__":
                 traffic_tables = pd.concat(list_tables)
 
             '''
-            Separate response for all chosen sites with user filter.
+            One response for all chosen sites with user filter.
             '''
             if user_ids == "True":
                     
                 traffic_user_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="user")
                 print("users: ", traffic_user_dict)
 
-                traffic_tab,resp = traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
+                traffic_tab, resp = traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traffic_event_group_item_dict,site_ids_filter)
 
                 '''
                 If traffic request method "/traffic/keyword"(https://wiki.cxense.com/pages/viewpage.action?pageId=21169352), we are using "/traffic/event" method with keyword filter to response 
