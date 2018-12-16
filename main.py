@@ -43,13 +43,18 @@ def cx_api(path, obj, username, secret):
 Error Handling and Retries: https://wiki.cxense.com/display/cust/The+Cxense+API+Tutorial
 
 '''
+def errorHandling(status, response, message):
+    if status != 200:
+        raise Exception("%s (http status = %s, error details: '%s')" % (message, status, response['error']))
+
 def pauseAndContinue(exceptionType, tries, e):
-    sleepTime = tries * tries * 10
+    sleepTime = tries * tries * 5
     print("Error of type '%s': %s. Trying again in %s seconds" % (exceptionType, e, sleepTime))
     time.sleep(sleepTime)
    
-def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5):
+def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 2):
     response = None
+    status = None
     tries = 0
     while (tries < maxTries):
         tries += 1
@@ -73,8 +78,8 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
         except Exception as e:
             raise Exception('Unhandled connection error: "%s"' % str(e))
         try:
-            #errorHandling(status, response, errorMsg)
-            print(status)
+            errorHandling(status, response, errorMsg)
+            print("Status: ", status)
             break
         except Exception as e:
             errorText = None
@@ -88,8 +93,8 @@ def execute(path, requestObj, username, secret, errorMsg = "error", maxTries = 5
                 pauseAndContinue(errorText, tries, e)
                 continue
             raise Exception(str(e))
-    if not response:
-        raise Exception(errorMsg)
+    #if not response:
+        #raise Exception(errorMsg)
     return status, response
 
 # --------------------------------------
@@ -166,7 +171,7 @@ def full_traffic_request_template(siteId,traffic_request_stop,traffic_request_st
                                         "uniqueUsers", 
                                         "urls"
                                         ]}
-    print(request_template)
+    #print(request_template)
     return(request_template)
 
 # --------------------------------------
@@ -201,7 +206,7 @@ def short_traffic_request_template(siteId,traffic_request_stop,traffic_request_s
                                             "urls",
                                             "weight"
                                         ]}
-    print(request_template)
+    #print(request_template)
     return(request_template)
 
 # --------------------------------------
@@ -225,6 +230,9 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
     if t_method == "event":
         method = "/traffic/event"
         limit = traffic_filters_limit
+    if (t_method == "event") and (not main_traffic_groups_list):
+        method = "/traffic/event"
+        limit = 1000
     if t_method == "user":
         method = "/traffic/user"
         limit = user_ids_limit
@@ -236,11 +244,13 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
                         "historyResolution": traffic_request_historyResolution,
                         "count": limit
                         }
-
+ 
     if traffic_request_stop == "now":
         del traffic_template['stop']
 
     traffic_response = (execute(method, traffic_template ,username, secret))
+    if traffic_response == (None, None):
+        return(traffic_response)
 
     traffic_dict = {}   # dict with all groups and items
 
@@ -298,7 +308,7 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
     df = pd.DataFrame(columns=df_columns)
 
     row_index = 1
-    print("PRODUCTS,", main_traffic_items_list)
+    #print("PRODUCTS,", main_traffic_items_list)
     for combination in itertools.product(*main_traffic_items_list):
         print("combination ,", combination)
         filters = []
@@ -332,7 +342,7 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
             for group in resp[1]['groups']:
                 print("group items count,", group['group'], len(group['items']))
                 for item in group['items']:
-                    print("item,", item['item'])
+                    #print("item,", item['item'])
                     r_date = dates[j]
                     r_group = group['group']
                     r_item = item['item']
@@ -363,7 +373,6 @@ def traffic_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
                             r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_site) + '-' + str(combination) 
                         else:
                             r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_site) 
-
 
                     if ("site" in traffic_request_groups) and (traffic_request_method == "/traffic/event") and (request_for_set_of_sites == "True"):
                         values = [r_id, r_date, r_group, r_site, r_events, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_urls, r_site]
@@ -441,11 +450,11 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
         for v in value:
             keyword_filter = {"type":"keyword", "group":key, "item":v}
             keyword_filters.append(keyword_filter)
-    print("keyword_filters: ", keyword_filters)
+    #print("keyword_filters: ", keyword_filters)
 
     for k_filter in keyword_filters:
 
-        print("PRODUCTS,", main_traffic_items_list)
+        #print("PRODUCTS,", main_traffic_items_list)
         for combination in itertools.product(*main_traffic_items_list):
             print("combination ,", combination)
             filters = []
@@ -460,13 +469,13 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
 
             traffic_request_template["filters"] = filters
 
-            print("filters: ", filters)
+            #print("filters: ", filters)
             print("keyord_filter: ", k_filter)
 
             traffic_request_method = "/traffic/event"
             resp = execute(traffic_request_method, traffic_request_template, username, secret)
-            print("resp: ",resp)
-            print("traffic_request_template: ", traffic_request_template)
+            #print("resp: ",resp)
+            #print("traffic_request_template: ", traffic_request_template)
 
             try:
                 dates = resp[1]['history']
@@ -479,7 +488,7 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
                 for group in resp[1]['groups']:
                     print("group items count,", group['group'], len(group['items']))
                     for item in group['items']:
-                        print("item,", item['item'])
+                        #print("item,", item['item'])
                         r_date = dates[j]
                         r_keyword_group = k_filter['group']
                         r_keyword_item = k_filter['item']
@@ -500,7 +509,7 @@ def keyword_tab_without_users(traffic_request_method,main_traffic_groups_list,tr
                             r_id = str(r_date) + '-' + str(r_keyword_group) + '-' + str(r_keyword_item) + '-' + str(r_site) 
 
                         values = [r_id, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_site]
-                            
+
                         arr = []
                         for val in combination:
                             arr.append(val)
@@ -564,11 +573,11 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
         for v in value:
             user_filter = {"type":"user", "group":key, "item":v}
             user_filters.append(user_filter)
-    print("user_filters: ", user_filters)
+    #print("user_filters: ", user_filters)
     
     for u_filter in user_filters:
         
-        print("PRODUCTS,", main_traffic_items_list)
+        #print("PRODUCTS,", main_traffic_items_list)
         for combination in itertools.product(*main_traffic_items_list):
             print("combination ,", combination)
             filters = []
@@ -581,7 +590,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
                 column_filter = {"type":"event", "group":main_traffic_groups_list[i], "item":combination[i]}
                 filters.append(column_filter)
 
-            print("filters: ", filters)
+            #print("filters: ", filters)
             print("user_filter: ", u_filter)
 
             traffic_request_template["filters"] = filters
@@ -600,7 +609,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
                 for group in resp[1]['groups']:
                     print("group items count,", group['group'], len(group['items']))
                     for item in group['items']:
-                        print("item,", item['item'])
+                        #print("item,", item['item'])
                         r_date = dates[j]
                         r_group = group['group']
                         r_item = item['item']
@@ -633,7 +642,7 @@ def traffic_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
                                 r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_user_group) + '-' + str(r_user_id) + '-' + str(r_site) + '-' + str(combination) 
                             else:
                                 r_id = str(r_date) + '-' + str(r_group) + '-' + str(r_item) + '-' + str(r_user_group) + '-' + str(r_user_id) + '-' + str(r_site) 
-                               
+
                         if ("site" in traffic_request_groups) and (traffic_request_method == "/traffic/event") and (request_for_set_of_sites == "True"):
                             values = [r_id, r_date, r_group, r_site, r_user_group, r_user_id, r_events, r_sessionStarts, r_sessionStops, r_sessionBounces, r_activeTime, r_uniqueUsers, r_urls, r_site]
                         if (traffic_request_method == "/traffic/event") or (traffic_request_method == "/traffic/custom"):
@@ -710,7 +719,7 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
         for v in value:
             keyword_filter = {"type":"keyword", "group":key, "item":v}
             keyword_filters.append(keyword_filter)
-    print("keyword_filters: ", keyword_filters)
+    #print("keyword_filters: ", keyword_filters)
 
     for k_filter in keyword_filters:
 
@@ -722,11 +731,11 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
             for v in value:
                 user_filter = {"type":"user", "group":key, "item":v}
                 user_filters.append(user_filter)
-        print("user_filters: ", user_filters)
+        #print("user_filters: ", user_filters)
         
         for u_filter in user_filters:
             
-            print("PRODUCTS,", main_traffic_items_list)
+            #print("PRODUCTS,", main_traffic_items_list)
             for combination in itertools.product(*main_traffic_items_list):
                 print("combination ,", combination)
                 filters = []
@@ -742,7 +751,7 @@ def keyword_tab_with_users(traffic_request_method,main_traffic_groups_list,traff
 
                 traffic_request_template["filters"] = filters
 
-                print("filters: ", filters)
+                #print("filters: ", filters)
                 print("user_filter: ", u_filter)
                 print("keyword_filter: ", k_filter)
 
@@ -923,6 +932,14 @@ if __name__ == "__main__":
             print("Invalid credentials")
             exit(1)
 
+        # traffic_request_stop
+        if traffic_request_stop == "today":
+            traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d' + 'T00:00:00.000+01:00')
+        else:
+            traffic_request_stop = new_date(traffic_request_stop)
+        # traffic_request_start
+        traffic_request_start = new_date(traffic_request_start)
+
         '''
         checking site ids for user ids
         '''
@@ -941,16 +958,9 @@ if __name__ == "__main__":
                 print("This site contains no user ids")
                 exit()
 
-        # traffic_request_stop
-        if traffic_request_stop == "today":
-            traffic_request_stop = datetime.datetime.today().strftime('%Y-%m-%d' + 'T00:00:00.000+01:00')
-        else:
-            traffic_request_stop = new_date(traffic_request_stop)
-        # traffic_request_start
-        traffic_request_start = new_date(traffic_request_start)
-
         list_tables = []
-
+        control_api_list = []
+        failed_api_site_list = []
         '''
         Separate response for all chosen sites.
         '''
@@ -960,6 +970,16 @@ if __name__ == "__main__":
                 print("SITE ID", siteId)
 
                 traffic_event_group_item_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="event")
+
+                if traffic_event_group_item_dict != (None, None):
+                    control_api_list.append(siteId)
+
+                if traffic_event_group_item_dict == (None, None):
+                    print("API call failed, siteId: ", siteId, ".", "Skipping this site")
+                    failed_api_site_list.append(siteId)
+                    if not len(control_api_list):
+                        traffic_tables = None
+                    continue
 
                 '''
                 Separate response for all chosen sites without user filter.
@@ -1023,9 +1043,14 @@ if __name__ == "__main__":
         '''
         if request_for_set_of_sites == "True":
             siteId = main_site_ids
-            print("SITE IDs", siteId)
+            print("SITE IDs", siteId, len(siteId))
 
             traffic_event_group_item_dict = traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traffic_request_historyResolution,execute,t_method="event")
+
+            if traffic_event_group_item_dict == (None, None):
+                print("API call failed, siteId: ", siteId, ".", "Skipping these sites")
+                print("Exit the program")
+                exit()
 
             '''
             One response for all chosen sites without user filter.
@@ -1088,6 +1113,12 @@ if __name__ == "__main__":
                 list_tables.append(traffic_tab)
                 traffic_tables = pd.concat(list_tables)
 
+        if (traffic_tables is None) and (not len(control_api_list)):
+            print("Exit the program")
+            exit()
+
+        print("SiteIds with failed API calls: ", failed_api_site_list, len(failed_api_site_list))
+        print("SiteIds with successful API calls: ", control_api_list, len(control_api_list))
         '''
         out traffic table
         '''
