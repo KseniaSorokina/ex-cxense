@@ -232,7 +232,7 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
         limit = traffic_filters_limit
     if (t_method == "event") and (not main_traffic_groups_list):
         method = "/traffic/event"
-        limit = 1000
+        limit = traffic_request_groups_limit
     if t_method == "user":
         method = "/traffic/user"
         limit = user_ids_limit
@@ -244,6 +244,11 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
                         "historyResolution": traffic_request_historyResolution,
                         "count": limit
                         }
+
+    if t_method == "event":
+       traffic_template['groups'] = main_traffic_groups_list 
+    if (t_method == "event") and (not main_traffic_groups_list):
+        traffic_template['groups'] = traffic_request_groups
  
     if traffic_request_stop == "now":
         del traffic_template['stop']
@@ -263,7 +268,7 @@ def traffic_response_dict(siteId,traffic_request_stop,traffic_request_start,traf
     except:
         print("Invalid credentials")
         exit(1)
-    
+
     return(traffic_dict)
 
 # --------------------------------------
